@@ -1,22 +1,86 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  OPERATOR
+  INCASATOR
+  ACCOUNTANT
+}
+
+// enum UserStatus {
+//   ACTIVE
+//   NONACTIVE
+// }
+
+// 0 => nonactive
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  password    String
+  code        String?
+  role        UserRole
+  status      Int       @default(1)
+  structureId Int?      @map("structure_id")
+  cashCount   Int       @default(0) @map("cash_count")
+  latitude    Decimal   @default(0.0) @db.Decimal(8, 6)
+  longitude   Decimal   @default(0.0) @db.Decimal(9, 6)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  @@map("users")
+}
+
+model Insurances {
+  id          Int       @id @default(autoincrement())
+  anketaId    String
+  amount      BigInt
+  status      String
+  createResId Int       @map("create_res_id")
+  polisId     String    @map("polis_id")
+  orderId     String    @map("order_id")
+  vendorId    String    @map("vendor_id")
+  request     Json?
+  response    Json?
+  data        Json?
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  user_id     Int
+  company_id  Int
+  service_id  Int
+
+  @@map("insurances")
+}
+
+model UserBalane {
+  id        Int       @id @default(autoincrement())
+  balance   BigInt?
+  user_id   Int
+  last_id   Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("user_balances")
+}
+
+model Structure {
+  id        Int       @id @default(autoincrement())
   name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  status    Int
+  region_id Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("structures")
 }
