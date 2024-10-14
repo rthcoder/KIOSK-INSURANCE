@@ -21,25 +21,32 @@ enum UserRole {
 // 0 => nonactive
 
 model User {
-  id          Int       @id @default(autoincrement())
-  name        String
-  email       String    @unique
-  password    String
-  code        String?
-  role        UserRole
-  status      Int       @default(1)
-  structureId Int?      @map("structure_id")
-  cashCount   Int       @default(0) @map("cash_count")
-  latitude    Decimal   @default(0.0) @db.Decimal(8, 6)
-  longitude   Decimal   @default(0.0) @db.Decimal(9, 6)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime? @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String
+  password  String
+  code      String?
+  role      UserRole
+  status    Int       @default(1)
+  cashCount Int       @default(0) @map("cash_count")
+  latitude  Decimal   @default(0.0) @db.Decimal(8, 6)
+  longitude Decimal   @default(0.0) @db.Decimal(9, 6)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
+  structureId Int? @map("structure_id")
+  incasatorId Int? @map("incasator_id")
+
+  structure    Structure?   @relation(fields: [structureId], references: [id])
+  insurances   Insurance[]
+  userBalances UserBalane[]
+
+  @@unique([code, email])
   @@map("users")
 }
 
-model Insurances {
+model Insurance {
   id          Int       @id @default(autoincrement())
   anketaId    String
   amount      BigInt
@@ -54,9 +61,13 @@ model Insurances {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime? @map("updated_at")
   deletedAt   DateTime? @map("deleted_at")
-  user_id     Int
-  company_id  Int
-  service_id  Int
+
+  userId    Int  @map("user_id")
+  companyId Int? @map("company_id")
+  serviceId Int? @map("service_id")
+
+  user        User?         @relation(fields: [userId], references: [id])
+  Transaction Transaction[]
 
   @@map("insurances")
 }
@@ -64,11 +75,14 @@ model Insurances {
 model UserBalane {
   id        Int       @id @default(autoincrement())
   balance   BigInt?
-  user_id   Int
-  last_id   Int
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
+  userId Int @map("user_id")
+  lastId Int @map("last_id")
+
+  user User? @relation(fields: [userId], references: [id])
 
   @@map("user_balances")
 }
@@ -77,10 +91,39 @@ model Structure {
   id        Int       @id @default(autoincrement())
   name      String?
   status    Int
-  region_id Int
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
+  regionId Int    @map("region_id")
+  User     User[]
+
   @@map("structures")
+}
+
+model Region {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model Deposit {
+  id Int @id @default(autoincrement())
+
+  incasatorId Int? @map("incasator_id")
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+
+  insuranceId Int @map("insurance_id")
+
+  insurance          Insurance?           @relation(fields: [insuranceId], references: [id])
+  UserBalanceHistory UserBalanceHistory[]
+}
+
+model UserBalanceHistory {
+  id            Int @id @default(autoincrement())
+  transactionId Int @map("transaction_id")
+
+  transaction Transaction? @relation(fields: [transactionId], references: [id])
 }

@@ -48,7 +48,6 @@ async function bootstrap() {
   //   },
   // })
 
-
   await app.listen(appConfig.port, appConfig.host)
 }
 bootstrap()

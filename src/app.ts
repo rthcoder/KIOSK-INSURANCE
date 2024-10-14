@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { PrismaModule } from './prisma/prisma.module'
-import { InsurancesModule, UsersModule} from '@modules'
+import { InsurancesModule, UsersModule } from '@modules'
 // Import boshqa modullar
 
 @Module({
@@ -11,7 +11,7 @@ import { InsurancesModule, UsersModule} from '@modules'
     }),
     PrismaModule,
     UsersModule,
-    InsurancesModule
+    InsurancesModule,
   ],
   controllers: [],
   providers: [],
