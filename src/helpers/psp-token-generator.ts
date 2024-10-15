@@ -4,7 +4,7 @@ import * as crypto from 'crypto'
  * @param serviceId - PSP tizimidagi to'lov vositasi identifikatori
  * @param secretKey - Maxfiy kalit, SHA-1 hash yaratishda ishlatiladi
  * @returns - Auth HTTP zagolovkasi, format: "Auth: service_id-hash-timestamp"
- **/
+**/
 export function createAuthHeader(serviceId: string, secretKey: string): string {
   const timestamp = Date.now()
 

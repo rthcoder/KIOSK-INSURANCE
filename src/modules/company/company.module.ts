@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { CompanyService } from './company.service'
-import { PspModule } from '@client'
+import { PspModule } from 'integration'
 import { CompanyController } from './company.controller'
 
 @Module({

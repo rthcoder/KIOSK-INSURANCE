@@ -10,8 +10,9 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
-import { createAuthHeader } from '@helpers'
+import { createAuthHeader, generateId } from '@helpers'
 import { MethodList } from '@enums'
+import { GetStepRequest, StepOneRequest, StepTwoRequest } from '@interfaces'
 
 @Injectable()
 export class PspService {
@@ -40,9 +41,85 @@ export class PspService {
       },
       data: {
         jsonrpc: '2.0',
-        id: 1,
+        id: generateId(),
         params: {},
         method: MethodList.GET_COMPANY,
+      },
+    })
+    return response
+  }
+
+  async getService(companyId: number) {
+    const response = await this.#_axios.request({
+      method: 'POST',
+      headers: {
+        Auth: createAuthHeader(process.env.PSP_SERVICE_ID, process.env.PSP_KEY),
+      },
+      data: {
+        jsonrpc: '2.0',
+        id: generateId(),
+        params: {
+          company_id: companyId
+        },
+        method: MethodList.GET_SERVICES,
+      },
+    })
+    return response
+  }
+
+  async getStep(param: GetStepRequest) {
+    const response = await this.#_axios.request({
+      method: 'POST',
+      headers: {
+        Auth: createAuthHeader(process.env.PSP_SERVICE_ID, process.env.PSP_KEY),
+      },
+      data: {
+        jsonrpc: '2.0',
+        id: generateId(),
+        params: param,
+        method: MethodList.GET_STEP,
+      },
+    })
+    return response
+  }
+
+  async stepOne(param: StepOneRequest) {
+    console.log(param);
+    
+    const response = await this.#_axios.request({
+      method: 'POST',
+      headers: {
+        Auth: createAuthHeader(process.env.PSP_SERVICE_ID, process.env.PSP_KEY),
+      },
+      data: {
+        jsonrpc: '2.0',
+        id: generateId(),
+        params: {
+          ...param,
+          step: MethodList.STEP_ONE
+        },
+        method: MethodList.GET_STEP,
+      },
+    })
+    return response
+  }
+
+  async stepTwo(param: StepTwoRequest) {
+    console.log(param);
+    
+    const response = await this.#_axios.request({
+      method: 'POST',
+      headers: {
+        Auth: createAuthHeader(process.env.PSP_SERVICE_ID, process.env.PSP_KEY),
+      },
+      data: {
+        jsonrpc: '2.0',
+        id: generateId(),
+        params: {
+          ...param,
+          step: MethodList.STEP_TWO
+        },
+        method: MethodList.GET_STEP,
       },
     })
     return response
