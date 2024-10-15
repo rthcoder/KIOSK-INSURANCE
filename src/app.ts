@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { PrismaModule } from './prisma/prisma.module'
-import {  PspModule} from '@client'
+import { PspModule } from '@client'
 import { InsurancesModule, UsersModule, CompanyModule } from '@modules'
 import { pspConfig } from '@config'
 // Import boshqa modullar
@@ -10,13 +10,13 @@ import { pspConfig } from '@config'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [pspConfig]
+      load: [pspConfig],
     }),
     PrismaModule,
     PspModule,
     UsersModule,
     InsurancesModule,
-    CompanyModule
+    CompanyModule,
   ],
   controllers: [],
   providers: [],

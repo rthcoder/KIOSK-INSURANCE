@@ -1,9 +1,17 @@
-import { BadRequestException, ForbiddenException, HttpException, HttpStatus, Injectable, InternalServerErrorException, RequestTimeoutException, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import axios, {AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  RequestTimeoutException,
+  UnauthorizedException,
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import axios, { AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { createAuthHeader } from '@helpers'
 import { MethodList } from '@enums'
-
 
 @Injectable()
 export class PspService {
@@ -17,7 +25,6 @@ export class PspService {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': createAuthHeader(config.getOrThrow<string>('psp.serviceId'), config.getOrThrow<string>('psp.serviceKey'))
       },
     })
 
@@ -25,15 +32,19 @@ export class PspService {
     this.#_axios.interceptors.response.use(this.#_responseFulfilled.bind(this), this.#_responseRejected.bind(this))
   }
 
-  async getCompany () {
+  async getCompany() {
     const response = await this.#_axios.request({
-      method: 'GET',
-      params: {
-        method: MethodList.GET_COMPANY
-      }
+      method: 'POST',
+      headers: {
+        Auth: createAuthHeader(process.env.PSP_SERVICE_ID, process.env.PSP_KEY),
+      },
+      data: {
+        jsonrpc: '2.0',
+        id: 1,
+        params: {},
+        method: MethodList.GET_COMPANY,
+      },
     })
-
-    console.log(response);
     return response
   }
 
@@ -54,7 +65,7 @@ export class PspService {
       throw new BadRequestException(response.data.error.message)
     }
 
-    return response
+    return response.data
   }
 
   async #_responseRejected(error: unknown): Promise<AxiosResponse> {
