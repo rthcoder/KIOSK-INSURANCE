@@ -11,6 +11,6 @@ export const pspConfig = registerAs<PspConfig>(
   (): PspConfig => ({
     url: process.env.PSP_URL,
     serviceId: process.env.PSP_SERVICE_ID,
-    serviceKey: process.env.PSP_KEY,
+    serviceKey: process.env.PSP_SERVICE_KEY,
   }),
 )

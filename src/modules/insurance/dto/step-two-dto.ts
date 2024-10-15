@@ -1,124 +1,124 @@
-import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from 'class-validator'
 
 export class VehicleDataDTO {
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type: string
 
   @IsString()
   @IsNotEmpty()
-  marka: string;
+  marka: string
 
   @IsString()
   @IsNotEmpty()
-  vmodel: string;
+  vmodel: string
 
   @IsString()
   @IsNotEmpty()
-  texpdate: string;
+  texpdate: string
 
   @IsString()
   @IsNotEmpty()
-  year: string;
+  year: string
 
   @IsString()
   @IsNotEmpty()
-  dvigatel: string;
+  dvigatel: string
 
   @IsString()
   @IsNotEmpty()
-  model: string;
+  model: string
 
   @IsString()
   @IsNotEmpty()
-  kuzov: string;
+  kuzov: string
 
   @IsString()
   @IsNotEmpty()
-  texpsery: string;
+  texpsery: string
 
   @IsString()
   @IsNotEmpty()
-  texpnumber: string;
+  texpnumber: string
 
   @IsString()
   @IsNotEmpty()
-  renumber: string;
+  renumber: string
 
   @IsString()
   @IsNotEmpty()
-  vehicle: string;
+  vehicle: string
 }
 
 export class StepTwoRequestDTO {
   @IsNumber()
   @IsNotEmpty()
-  company_id: number;
+  company_id: number
 
   @IsNumber()
   @IsNotEmpty()
-  service_id: number;
+  service_id: number
 
   @IsString()
   @IsNotEmpty()
-  owner_pinfl: string;
+  owner_pinfl: string
 
   @IsNumber()
   @IsNotEmpty()
-  owner_fy: number;
+  owner_fy: number
 
   @IsNumber()
   @IsNotEmpty()
-  use_territory: number;
+  use_territory: number
 
   @IsNumber()
   @IsNotEmpty()
-  owner_isdriver: number;
+  owner_isdriver: number
 
   @IsString()
   @IsNotEmpty()
-  owner_pasp_sery: string;
+  owner_pasp_sery: string
 
   @IsString()
   @IsNotEmpty()
-  owner_pasp_num: string;
-
-  @IsString()
-  @IsOptional()  
-  appl_pasp_sery: string | null;
+  owner_pasp_num: string
 
   @IsString()
   @IsOptional()
-  appl_pasp_num: string | null;
+  appl_pasp_sery: string | null
 
   @IsString()
   @IsOptional()
-  appl_fizyur: string | null;
+  appl_pasp_num: string | null
 
   @IsString()
   @IsOptional()
-  appl_pinfl: string | null;
+  appl_fizyur: string | null
+
+  @IsString()
+  @IsOptional()
+  appl_pinfl: string | null
 
   @IsNumber()
   @IsNotEmpty()
-  driver_limit: number;
+  driver_limit: number
 
   @IsNumber()
   @IsNotEmpty()
-  period: number;
+  period: number
 
   @IsNumber()
   @IsNotEmpty()
-  applicant_isowner: number;
+  applicant_isowner: number
 
   @IsString()
   @IsNotEmpty()
-  owner_phone: string;
+  owner_phone: string
 
   @IsNumber()
   @IsNotEmpty()
-  discount: number;
+  discount: number
 
   @IsNotEmpty()
-  data: VehicleDataDTO; 
+  data: VehicleDataDTO
 }

@@ -1,17 +1,18 @@
-import { Injectable, HttpException, InternalServerErrorException } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
-import {createHash} from 'crypto'
-import { createAuthHeader } from '@helpers';
+import { Injectable, HttpException, InternalServerErrorException } from '@nestjs/common'
+import { HttpService } from '@nestjs/axios'
+import { ConfigService } from '@nestjs/config'
+import { firstValueFrom } from 'rxjs'
+import * as crypto from 'crypto'
+import { createAuthHeader } from '@helpers'
 
 @Injectable()
 export class InfinityRequestService {
-
-  private response: any;
-  private method: string;
-  private params: any;
-  private errorUnknown: any;
+  private response: any
+  private method: string
+  private params: any
+  private errorUnknown: any
+  private serviceKey: string
+  private serviceId: string
 
   constructor(
     private readonly httpService: HttpService,
@@ -20,10 +21,10 @@ export class InfinityRequestService {
 
   // So'rovni yuborish
   async send() {
-    const jsonPayload = this.getRequest();
+    const jsonPayload = this.getRequest()
 
-    const url = this.configService.get<string>('psp.url');
-    const authHeader = createAuthHeader();
+    const url = this.configService.get<string>('psp.url')
+    const authHeader = this.generateForAuth()
 
     try {
       const response = await firstValueFrom(
@@ -34,100 +35,106 @@ export class InfinityRequestService {
           },
           timeout: 30000,
         }),
-      );
-      
-      this.response = response.data;
+      )
+
+      this.response = response.data
 
       if (!this.response) {
         this.setErrorUnknown({
           code: 'Ответ недействителен',
           message: 'UNKNOWN_RESPONSE_ERROR',
-        });
+        })
       }
 
-      return this;
-
-    } catch (error:any) {
+      return this
+    } catch (error: any) {
       if (error.response) {
-        throw new HttpException(
-          `CURL request failed: ${error.message}`,
-          error.response.status,
-        );
+        throw new HttpException(`CURL request failed: ${error.message}`, error.response.status)
       } else {
-        throw new InternalServerErrorException('CURL request failed: ' + error.message);
+        throw new InternalServerErrorException('CURL request failed: ' + error.message)
       }
     }
   }
 
   // Parametrlarni set qilish
   setParams(params: any): InfinityRequestService {
-    this.params = params;
-    return this;
+    this.params = params
+    return this
+  }
+
+  setServiceKey(params: string): InfinityRequestService {
+    this.serviceKey = params
+    return this
+  }
+
+  setServiceId(params: string): InfinityRequestService {
+    this.serviceId = params
+    return this
   }
 
   // Javobni saqlash
   setResponse(response: any): InfinityRequestService {
-    this.response = response;
-    return this;
+    this.response = response
+    return this
   }
 
   // Xato haqida ma'lumot berish
   setErrorUnknown(error: any) {
-    this.errorUnknown = error;
+    this.errorUnknown = error
   }
 
   getParams(): any {
-    console.log(this.params);
-    
-    return this.params || {};
+    return this.params || {}
   }
 
   setMethod(method: string): InfinityRequestService {
-    this.method = method;
-    return this;
+    this.method = method
+    return this
   }
 
   getMethod(): string {
-    return this.method || null;
+    return this.method || null
   }
 
   generateId(): number {
-    return Math.floor(Math.random() * 1000);
+    return Math.floor(Math.random() * 1000)
   }
 
-  // // Authorization header generatsiya qilish
-  // private generateForAuth(): string {
-  //   const timestamp = Date.now()
+  // Authorization header generatsiya qilish
+  private generateForAuth(): string {
+    const timestamp = Date.now()
 
-  //   const hash = crypto
-  //     .createHash('sha1')
-  //     .update(secretKey + timestamp)
-  //     .digest('hex')
-  
-  //   const authHeader = `${serviceId}-${hash}-${timestamp}`
-  
-  //   return authHeader
-  //   return authHeader;
-  // }
+    console.log(this.serviceKey)
+    console.log(this.serviceId)
+
+    const hash = crypto
+      .createHash('sha1')
+      .update(this.serviceKey + timestamp)
+      .digest('hex')
+
+    const authHeader = `${this.serviceId}-${hash}-${timestamp}`
+
+    return authHeader
+  }
 
   getResponse(): any {
-    return this.response || {};
+    return this.response || {}
   }
 
   getResult(): any {
-    return this.response?.result || [];
+    return this.response?.result || []
   }
 
   getError(): any {
-    return this.response?.error || this.errorUnknown;
+    return this.response?.error || this.errorUnknown
   }
 
   getErrorUnknown(): any {
-    return this.errorUnknown || { message: 'Unknown error' };
+    return this.errorUnknown || { message: 'Unknown error' }
   }
 
   isOk(): boolean {
-    return !this.getError();
+    return !this.getError()
   }
 
   // getResultSms(): any {
@@ -141,7 +148,7 @@ export class InfinityRequestService {
   // }
 
   getDetails(): any {
-    return this.response?.result?.details || [];
+    return this.response?.result?.details || []
   }
 
   // So'rov tayyorlash
@@ -151,6 +158,6 @@ export class InfinityRequestService {
       id: this.generateId(),
       method: this.getMethod(),
       params: this.getParams(),
-    };
+    }
   }
 }

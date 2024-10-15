@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { PrismaModule } from './prisma/prisma.module'
 import { PspModule } from 'gateRequest'
-import {  UsersModule, CompanyModule } from '@modules'
+import { UsersModule, CompanyModule } from '@modules'
 import { pspConfig } from '@config'
 // Import boshqa modullar
 
