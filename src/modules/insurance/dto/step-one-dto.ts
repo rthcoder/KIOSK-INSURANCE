@@ -14,6 +14,10 @@ export class stepOneRequestDTO implements StepOneRequest {
   @IsNotEmpty()
   texpsery: string
 
+  @IsNumber()
+  @IsNotEmpty()
+  step: number
+
   @IsString()
   @IsNotEmpty()
   texpnumber: string

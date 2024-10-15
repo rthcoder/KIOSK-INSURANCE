@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { CompanyService } from './company.service'
+import { CompanyService } from './insurance.service'
 import { getServiceRequestDTO, getStepRequestDTO, stepOneRequestDTO, StepTwoRequestDTO} from './dto'
 
 @ApiTags('Company Service')
@@ -12,26 +12,28 @@ export class CompanyController {
 
   @Post('get-companies')
   async getCompany() {
-    return this.companyService.findCompany()
+    const result =  await this.companyService.findCompany()
+    return  result.getResult()
   }
 
   @Post('get-company-services')
   async getServices(@Body() getServiceDto: getServiceRequestDTO) {
-    return this.companyService.findService(getServiceDto)
+    const result = await this.companyService.findService(getServiceDto)
+    return  result.getResult()
   }
 
   @Post('get-step')
   async getStep(@Body() getStepDto: getStepRequestDTO) {
-    return this.companyService.getStep(getStepDto)
+    return (await this.companyService.getStep(getStepDto)).getResponse()
   }
 
   @Post('get-step-one')
-  async stepOne(@Body() stepOneDto: stepOneRequestDTO) {
-    return this.companyService.stepOne(stepOneDto)
+  async stepOne(@Body() stepOneDto: stepOneRequestDTO) {    
+    return (await this.companyService.getStep(stepOneDto)).getResponse()
   }
 
   @Post('get-step-two')
   async stepTwo(@Body() stepTwoDto: StepTwoRequestDTO) {
-    return this.companyService.stepTwo(stepTwoDto)
+    return (await this.companyService.getStep(stepTwoDto)).getResponse()
   }
 }

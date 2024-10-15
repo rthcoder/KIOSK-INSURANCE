@@ -21,6 +21,7 @@ export interface GetStepRequest {
 export interface StepOneRequest {
   company_id: number
   service_id: number
+  step: number
   texpsery: string
   texpnumber: string
   renumber: string

@@ -5,8 +5,15 @@ import * as crypto from 'crypto'
  * @param secretKey - Maxfiy kalit, SHA-1 hash yaratishda ishlatiladi
  * @returns - Auth HTTP zagolovkasi, format: "Auth: service_id-hash-timestamp"
 **/
-export function createAuthHeader(serviceId: string, secretKey: string): string {
+
+
+
+
+export function createAuthHeader(): string {
   const timestamp = Date.now()
+
+  let serviceId = process.env.PSP_SERVICE_ID
+  let secretKey = process.env.PSP_KEY
 
   const hash = crypto
     .createHash('sha1')

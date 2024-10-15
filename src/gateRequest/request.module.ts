@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common'
-import { PspService } from './axios.service'
+import { InfinityRequestService } from './request.service'
 import { HttpModule } from '@nestjs/axios'
 
 @Module({
   imports: [HttpModule],
-  providers: [PspService],
-  exports: [PspService],
+  providers: [InfinityRequestService],
+  exports: [InfinityRequestService],
 })
 export class PspModule {}
