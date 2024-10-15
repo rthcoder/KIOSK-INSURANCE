@@ -42,6 +42,9 @@
       "@clients": [
         "./clients"
       ],
+      "@client": [
+        "./client"
+      ],
     },
     "typeRoots": [
       "./node_modules/@types",

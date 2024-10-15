@@ -1,4 +1,8 @@
 import { Controller } from '@nestjs/common'
+import { ApiTags } from '@nestjs/swagger';
+import { CompanyService } from 'modules/company';
 
-@Controller('insurances')
-export class InsurancesController {}
+
+@Controller()
+export class InsurancesController {
+}
