@@ -1,29 +1,42 @@
-import { InfinityRequestService, InsuranceGateService } from 'gateRequest'
+import { InsuranceGateService } from 'gateRequest'
 import { Injectable } from '@nestjs/common'
-import { GetServiceRequest, GetStepRequest, StepOneRequest, StepTwoRequest } from '@interfaces'
-import { HttpService } from '@nestjs/axios'
-import { ConfigService } from '@nestjs/config'
-import { MethodList } from '@enums'
+import { GetServiceRequest, GetStepRequest } from '@interfaces'
 
 @Injectable()
-export class CompanyService {
+export class InsuranceService {
   constructor(private readonly insuranceGateService: InsuranceGateService) {}
 
-  // findCompany metodi
   async findCompany() {
     const result = await this.insuranceGateService.findCompany(process.env.PSP_SERVICE_ID, process.env.PSP_SERVICE_KEY)
+    return result.getResult()
+  }
+
+  async findService(data: GetServiceRequest) {
+    const result = await this.insuranceGateService.findService(
+      data,
+      process.env.PSP_SERVICE_ID,
+      process.env.PSP_SERVICE_KEY,
+    )
+    return result.getResult()
+  }
+
+  // getStep metodi
+  async getStep(data: GetStepRequest) {
+    const result = await this.insuranceGateService.getStep(
+      data,
+      process.env.PSP_SERVICE_ID,
+      process.env.PSP_SERVICE_KEY,
+    )
     return result.getResponse()
   }
 
-  // // findService metodi
-  // async findService(data: GetServiceRequest) {
-  //   const result = await this.insuranceGateService.findCompany()
-  //   return result.getResponse()
-  // }
-
-  // // getStep metodi
-  // async getStep(data: any) {
-  //   const result = await this.insuranceGateService.findCompany()
-  //   return result.getResponse()
-  // }
+  //create insurance yani invoice olish metodi
+  async createInsurance(data: any) {
+    const result = await this.insuranceGateService.createInsurance(
+      data,
+      process.env.PSP_SERVICE_ID,
+      process.env.PSP_SERVICE_KEY,
+    )
+    return result.getResponse()
+  }
 }

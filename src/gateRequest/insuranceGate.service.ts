@@ -11,16 +11,24 @@ export class InsuranceGateService extends InfinityRequestService {
   }
 
   // findService metodi
-  async findService(data: GetServiceRequest) {
-    this.setMethod(MethodList.GET_SERVICES)
-    this.setParams(data)
-    return this.send()
+  async findService(data: GetServiceRequest, serviceId: string, serviceKey: string) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.GET_SERVICES)
+      .setParams(data)
+      .send()
   }
 
   // getStep metodi
-  async getStep(data: any) {
-    this.setMethod(MethodList.GET_STEP)
-    this.setParams(data)
-    return this.send()
+  async getStep(data: any, serviceId: string, serviceKey: string) {
+    return this.setServiceId(serviceId).setServiceKey(serviceKey).setMethod(MethodList.GET_STEP).setParams(data).send()
+  }
+
+  async createInsurance(data: any, serviceId: string, serviceKey: string) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.CREATE_INSURANCE)
+      .setParams(data)
+      .send()
   }
 }

@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import * as crypto from 'crypto'
-import { createAuthHeader } from '@helpers'
+import { REQUEST_ERRORS } from '@enums'
 
 @Injectable()
 export class InfinityRequestService {
@@ -37,21 +37,24 @@ export class InfinityRequestService {
         }),
       )
 
+      console.log(response)
+      console.log(jsonPayload.params)
+
       this.response = response.data
 
       if (!this.response) {
         this.setErrorUnknown({
-          code: 'Ответ недействителен',
-          message: 'UNKNOWN_RESPONSE_ERROR',
+          code: REQUEST_ERRORS.INVALID_ANSWER,
+          message: REQUEST_ERRORS.UNKNOWN_RESPONSE_ERROR,
         })
       }
 
       return this
     } catch (error: any) {
       if (error.response) {
-        throw new HttpException(`CURL request failed: ${error.message}`, error.response.status)
+        throw new HttpException(`AXIOS request failed: ${error.message}`, error.response.status)
       } else {
-        throw new InternalServerErrorException('CURL request failed: ' + error.message)
+        throw new InternalServerErrorException('AXIOS request failed: ' + error.message)
       }
     }
   }
@@ -103,9 +106,6 @@ export class InfinityRequestService {
   // Authorization header generatsiya qilish
   private generateForAuth(): string {
     const timestamp = Date.now()
-
-    console.log(this.serviceKey)
-    console.log(this.serviceId)
 
     const hash = crypto
       .createHash('sha1')

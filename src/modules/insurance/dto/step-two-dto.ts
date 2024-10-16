@@ -59,6 +59,10 @@ export class StepTwoRequestDTO {
   @IsNotEmpty()
   service_id: number
 
+  @IsNumber()
+  @IsNotEmpty()
+  step: number
+
   @IsString()
   @IsNotEmpty()
   owner_pinfl: string

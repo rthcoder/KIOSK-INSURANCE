@@ -6,4 +6,5 @@ export enum MethodList {
   STEP_TWO = 2,
   STEP_THREE = 3,
   STEP_FOUR = 4,
+  CREATE_INSURANCE = 'create',
 }
