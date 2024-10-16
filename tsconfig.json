@@ -6,9 +6,6 @@
     "baseUrl": "./src",
     "moduleResolution": "node",
     "paths": {
-      "@entities": [
-        "./entities"
-      ],
       "@helpers": [
         "./helpers"
       ],
@@ -41,6 +38,9 @@
       ],
       "@clients": [
         "./clients"
+      ],
+      "@client": [
+        "./client"
       ],
     },
     "typeRoots": [
