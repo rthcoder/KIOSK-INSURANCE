@@ -7,25 +7,28 @@ export class InsuranceService {
   constructor(private readonly insuranceGateService: InsuranceGateService) {}
 
   async findCompany() {
-    const result = await this.insuranceGateService.findCompany(process.env.PSP_SERVICE_ID, process.env.PSP_SERVICE_KEY)
-    return result.getResult()
+    const result = await this.insuranceGateService.findCompany(
+      process.env.QUICKPAY_SERVICE_ID,
+      process.env.QUICKPAY_SERVICE_KEY,
+    )
+    return result.getResponse()
   }
 
   async findService(data: GetServiceRequest) {
     const result = await this.insuranceGateService.findService(
       data,
-      process.env.PSP_SERVICE_ID,
-      process.env.PSP_SERVICE_KEY,
+      process.env.QUICKPAY_SERVICE_ID,
+      process.env.QUICKPAY_SERVICE_KEY,
     )
-    return result.getResult()
+    return result.getResponse()
   }
 
   // getStep metodi
   async getStep(data: GetStepRequest) {
     const result = await this.insuranceGateService.getStep(
       data,
-      process.env.PSP_SERVICE_ID,
-      process.env.PSP_SERVICE_KEY,
+      process.env.QUICKPAY_SERVICE_ID,
+      process.env.QUICKPAY_SERVICE_KEY,
     )
     return result.getResponse()
   }
@@ -34,8 +37,8 @@ export class InsuranceService {
   async createInsurance(data: any) {
     const result = await this.insuranceGateService.createInsurance(
       data,
-      process.env.PSP_SERVICE_ID,
-      process.env.PSP_SERVICE_KEY,
+      process.env.QUICKPAY_SERVICE_ID,
+      process.env.QUICKPAY_SERVICE_KEY,
     )
     return result.getResponse()
   }

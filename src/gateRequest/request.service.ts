@@ -23,7 +23,7 @@ export class InfinityRequestService {
   async send() {
     const jsonPayload = this.getRequest()
 
-    const url = this.configService.get<string>('psp.url')
+    const url = this.configService.get<string>('insurance.url')
     const authHeader = this.generateForAuth()
 
     try {

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { PrismaModule } from './prisma/prisma.module'
-import { PspModule } from 'gateRequest'
+import { RequestModule } from 'gateRequest'
 import { UsersModule, CompanyModule } from '@modules'
 import { pspConfig } from '@config'
 // Import boshqa modullar
@@ -13,7 +13,7 @@ import { pspConfig } from '@config'
       load: [pspConfig],
     }),
     PrismaModule,
-    PspModule,
+    RequestModule,
     UsersModule,
     CompanyModule,
   ],

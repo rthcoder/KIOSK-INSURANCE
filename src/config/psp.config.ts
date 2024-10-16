@@ -7,10 +7,10 @@ export declare interface PspConfig {
 }
 
 export const pspConfig = registerAs<PspConfig>(
-  'psp',
+  'insurance',
   (): PspConfig => ({
-    url: process.env.PSP_URL,
-    serviceId: process.env.PSP_SERVICE_ID,
-    serviceKey: process.env.PSP_SERVICE_KEY,
+    url: process.env.INSURANCE_URL,
+    serviceId: process.env.QUICKPAY_SERVICE_ID,
+    serviceKey: process.env.QUICKPAY_SERVICE_KEY,
   }),
 )

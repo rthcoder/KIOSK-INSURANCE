@@ -7,4 +7,4 @@ import { HttpModule } from '@nestjs/axios'
   providers: [InfinityRequestService],
   exports: [InfinityRequestService],
 })
-export class PspModule {}
+export class RequestModule {}
