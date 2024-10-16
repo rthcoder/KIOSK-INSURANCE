@@ -1,2 +1,3 @@
 export * from './users'
-export * from './insurances'
+export * from './insurance'
+export * from './insurance'

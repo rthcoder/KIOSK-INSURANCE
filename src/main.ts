@@ -5,6 +5,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common'
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express'
 import { App } from './app'
 import { appConfig } from 'config/app.config'
+import { swaggerConfig } from '@config'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(App, new ExpressAdapter(), {
@@ -40,13 +41,13 @@ async function bootstrap() {
   app.set('trust proxy', true)
   app.set('x-powered-by', false)
 
-  // const document = SwaggerModule.createDocument(app, swaggerConfig.options)
+  const document = SwaggerModule.createDocument(app, swaggerConfig.options)
 
-  // SwaggerModule.setup(swaggerConfig.path, app, document, {
-  //   swaggerOptions: {
-  //     defaultModelsExpandDepth: -1,
-  //   },
-  // })
+  SwaggerModule.setup(swaggerConfig.path, app, document, {
+    swaggerOptions: {
+      defaultModelsExpandDepth: -1,
+    },
+  })
 
   await app.listen(appConfig.port, appConfig.host)
 }
