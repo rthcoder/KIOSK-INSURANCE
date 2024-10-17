@@ -2,33 +2,24 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PayService } from './pay.service'
 import { CreatePayDto } from './dto/create-pay.dto'
 import { UpdatePayDto } from './dto/update-pay.dto'
+import { ApiTags } from '@nestjs/swagger'
 
-@Controller('pay')
+@ApiTags('Pay Service')
+@Controller({
+  version: '1',
+})
 export class PayController {
   constructor(private readonly payService: PayService) {}
 
-  @Post()
-  create(@Body() createPayDto: CreatePayDto) {
-    return this.payService.create(createPayDto)
+  @Post('check-pay-card')
+  payByCard(@Body() createPayDto: any) {
+    console.log(createPayDto)
+    return this.payService.payByCard(createPayDto)
   }
 
-  @Get()
-  findAll() {
-    return this.payService.findAll()
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.payService.findOne(+id)
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePayDto: UpdatePayDto) {
-    return this.payService.update(+id, updatePayDto)
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.payService.remove(+id)
+  @Post('prepare-pay-card')
+  preparePay(@Body() preparePayDto: any) {
+    console.log(preparePayDto)
+    return this.payService.payByCard(preparePayDto)
   }
 }

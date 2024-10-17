@@ -7,5 +7,7 @@ export enum MethodList {
   STEP_THREE = 3,
   STEP_FOUR = 4,
   CREATE_INSURANCE = 'create',
-  GET_POLIS_URL = 'getPolisUrl',
+  GET_POLIS_URL = 'get_polis_url',
+  PAM_CHECK = 'pam.check',
+  PAM_CHECK_PAYMENT = 'pam.prepare_pay',
 }

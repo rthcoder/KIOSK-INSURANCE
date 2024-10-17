@@ -9,3 +9,5 @@ export type {
   StepThreeData,
   StepFourRequest,
 } from './create-insurance'
+
+export type { GetInsuranceIds } from './request.interface'

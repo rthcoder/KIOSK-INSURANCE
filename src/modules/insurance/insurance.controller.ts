@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Get, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { InsuranceService } from './insurance.service'
 import {
@@ -59,7 +59,7 @@ export class InsuranceController {
     return result
   }
 
-  @Post('create-invoice')
+  @Post('create-insurance')
   async createInvoice(@Body() createInvoiceDto: any) {
     const result = await this.insuranceService.createInsurance(createInvoiceDto)
     return result

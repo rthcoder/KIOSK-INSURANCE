@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { PrismaModule } from './prisma/prisma.module'
 import { RequestModule } from 'gateRequest'
-import { UsersModule, CompanyModule } from '@modules'
+import { UsersModule, CompanyModule, PayModule } from '@modules'
 import { pspConfig } from '@config'
 // Import boshqa modullar
 
@@ -16,6 +16,7 @@ import { pspConfig } from '@config'
     RequestModule,
     UsersModule,
     CompanyModule,
+    PayModule,
   ],
   controllers: [],
   providers: [],
