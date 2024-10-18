@@ -1,16 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
 import { StructureService } from './structure.service'
-import { CreateStructureDto } from './dto/create-structure.dto'
-import { UpdateStructureDto } from './dto/update-structure.dto'
+import { CreateStructureDTO, UpdateStructureDTO } from './dto'
+import { ApiTags } from '@nestjs/swagger'
 
-@Controller('structure')
+@ApiTags('Structure Service')
+@Controller({
+  version: '1',
+  path: 'structures',
+})
 export class StructureController {
   constructor(private readonly structureService: StructureService) {}
-
-  @Post()
-  create(@Body() createStructureDto: CreateStructureDto) {
-    return this.structureService.create(createStructureDto)
-  }
 
   @Get()
   findAll() {
@@ -22,8 +21,13 @@ export class StructureController {
     return this.structureService.findOne(+id)
   }
 
+  @Post()
+  create(@Body() createStructureDto: CreateStructureDTO) {
+    return this.structureService.create(createStructureDto)
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStructureDto: UpdateStructureDto) {
+  update(@Param('id') id: string, @Body() updateStructureDto: UpdateStructureDTO) {
     return this.structureService.update(+id, updateStructureDto)
   }
 

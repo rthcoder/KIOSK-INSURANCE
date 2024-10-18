@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsPositive, IsOptional } from 'class-validator'
+import { IsString, IsOptional } from 'class-validator'
 import { UpdateBankRequest } from '@interfaces'
 
 export class UpdateBankDTO implements UpdateBankRequest {

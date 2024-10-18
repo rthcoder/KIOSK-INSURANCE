@@ -1,22 +1,80 @@
-import { Injectable } from '@nestjs/common'
-import { CreateStructureDto } from './dto/create-structure.dto'
-import { UpdateStructureDto } from './dto/update-structure.dto'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import { CreateStructureRequest, UpdateStructureRequest } from '@interfaces'
+import { PrismaService } from 'prisma/prisma.service'
 
 @Injectable()
 export class StructureService {
-  create(createStructureDto: CreateStructureDto) {
-    return 'This action adds a new structure'
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll() {
+    const structures = await this.prisma.structure.findMany({
+      where: {
+        deletedAt: {
+          equals: null,
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    })
+
+    return {
+      data: structures,
+    }
   }
 
-  findAll() {
-    return `This action returns all structure`
+  async findOne(id: number) {
+    const structure = await this.prisma.structure.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!structure) {
+      throw new NotFoundException('Structure not found with given ID!')
+    }
+
+    return {
+      data: structure,
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} structure`
+  async create(data: CreateStructureRequest): Promise<void> {
+    const structureNameExists = await this.prisma.structure.findFirst({
+      where: {
+        name: data?.name,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (structureNameExists) {
+      throw new ConflictException('Structure exists with given name!')
+    }
+
+    const regionExists = await this.prisma.region.findUnique({
+      where: {
+        id: data?.regionId,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!regionExists) {
+      throw new NotFoundException('Region not found with given ID!')
+    }
+
+    const newStructure = await this.prisma.structure.create({
+      data: data,
+    })
   }
 
-  update(id: number, updateStructureDto: UpdateStructureDto) {
+  update(id: number, data: UpdateStructureRequest) {
     return `This action updates a #${id} structure`
   }
 

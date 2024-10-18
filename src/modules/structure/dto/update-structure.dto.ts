@@ -1,4 +1,16 @@
-import { PartialType } from '@nestjs/swagger'
-import { CreateStructureDto } from './create-structure.dto'
+import { UpdateStructureRequest } from '@interfaces'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
 
-export class UpdateStructureDto extends PartialType(CreateStructureDto) {}
+export class UpdateStructureDTO implements UpdateStructureRequest {
+  @IsOptional()
+  @IsString()
+  name?: string
+
+  @IsOptional()
+  @IsNumber()
+  region_id?: number
+
+  @IsOptional()
+  @IsNumber()
+  status?: number
+}

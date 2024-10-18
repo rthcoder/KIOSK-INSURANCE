@@ -1,9 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common'
 import { RegionService } from './region.service'
-import { CreateRegionDTO } from './dto/create-region.dto'
-import { UpdateRegionDTO } from './dto/update-region.dto'
 import { ApiTags } from '@nestjs/swagger'
-import { CreateRegionRequest } from '@interfaces'
+import { CreateRegionDTO, UpdateRegionDTO } from './dto'
 
 @ApiTags('Region Service')
 @Controller({
@@ -14,8 +12,8 @@ export class RegionController {
   constructor(private readonly regionService: RegionService) {}
 
   @Get()
-  findAll() {
-    return this.regionService.findAll()
+  findAll(@Query() query: any) {
+    return this.regionService.findAll(query)
   }
 
   @Get(':id')
@@ -24,7 +22,7 @@ export class RegionController {
   }
 
   @Post()
-  create(@Body() createRegionDto: CreateRegionRequest) {
+  create(@Body() createRegionDto: CreateRegionDTO) {
     return this.regionService.create(createRegionDto)
   }
 

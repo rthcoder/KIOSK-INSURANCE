@@ -20,3 +20,5 @@ export type {
   FindAllRegionResponse,
   FindOneRegionResponse,
 } from './region.interface'
+
+export type { CreateStructureRequest, UpdateStructureRequest } from './structure.interface'

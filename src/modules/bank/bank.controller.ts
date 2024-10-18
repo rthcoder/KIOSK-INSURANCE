@@ -7,7 +7,7 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('Bank Service')
 @Controller({
   version: '1',
-  path: 'bank',
+  path: 'banks',
 })
 export class BankController {
   constructor(private readonly bankService: BankService) {}

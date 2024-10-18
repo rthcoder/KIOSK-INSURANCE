@@ -14,10 +14,7 @@ export class AuthService {
   ) {}
 
   async login(data: LoginRequest): Promise<LoginResponse> {
-    console.log(1)
-
     const user = await this.usersService.validate({ email: data.email })
-    console.log(1)
 
     const checkUser = await this.prisma.user.findUnique({
       where: {

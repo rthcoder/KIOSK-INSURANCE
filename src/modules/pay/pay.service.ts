@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { CreatePayDto } from './dto/create-pay.dto'
-import { UpdatePayDto } from './dto/update-pay.dto'
 import { PayGate } from 'gateRequest'
 import { PrismaService } from 'prisma/prisma.service'
 

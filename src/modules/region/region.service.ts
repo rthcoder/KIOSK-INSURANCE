@@ -1,18 +1,32 @@
-import { Injectable } from '@nestjs/common'
-import { CreateRegionRequest, FindAllRegionResponse, FindOneRegionResponse } from '@interfaces'
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
+import { CreateRegionRequest, FindAllRegionResponse, FindOneRegionResponse, UpdateRegionRequest } from '@interfaces'
 import { PrismaService } from 'prisma/prisma.service'
+import { FilterService } from '@helpers'
 @Injectable()
 export class RegionService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<FindAllRegionResponse> {
-    const regions = await this.prisma.region.findMany({
-      where: {
-        deletedAt: {
-          equals: null,
-        },
-      },
-    })
+  async findAll(query: any): Promise<FindAllRegionResponse> {
+    const { limit, sort, filters } = query
+
+    const parsedLimit = parseInt(limit, 10)
+
+    const parsedSort = sort ? JSON?.parse(sort) : {}
+
+    const parsedFilters = filters ? JSON?.parse(filters) : []
+
+    const regions = await FilterService?.applyFilters('region', parsedFilters, parsedSort)
+
+    // const regions = await this.prisma.region.findMany({
+    //   where: {
+    //     deletedAt: {
+    //       equals: null,
+    //     },
+    //   },
+    //   orderBy: {
+    //     createdAt: 'asc', //xozircha ketin filtrga qarab o'zgaradi hammasi
+    //   },
+    // })
 
     const result = []
 
@@ -34,8 +48,15 @@ export class RegionService {
     const region = await this.prisma.region.findFirst({
       where: {
         id: id,
+        deletedAt: {
+          equals: null,
+        },
       },
     })
+
+    if (!region) {
+      throw new NotFoundException('Region not found with this ID!')
+    }
 
     const result = {
       id: region?.id,
@@ -49,17 +70,81 @@ export class RegionService {
     }
   }
 
-  async create(data: CreateRegionRequest) {
+  async create(data: CreateRegionRequest): Promise<void> {
+    const regionExists = await this.prisma.region.findFirst({
+      where: {
+        name: data?.name,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (regionExists) {
+      throw new ConflictException('Region exists with this name!')
+    }
+
     const newRegion = await this.prisma.region.create({
       data: data,
     })
   }
 
-  update(id: number, updateRegionDto: any) {
-    return `This action updates a #${id} region`
+  async update(id: number, data: UpdateRegionRequest): Promise<void> {
+    const regionExists = await this.prisma.region.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    const regionNameExists = await this.prisma.region.findFirst({
+      where: {
+        name: data?.name,
+      },
+    })
+
+    if (!regionExists) {
+      throw new NotFoundException('Region not found with given ID')
+    }
+
+    if (regionNameExists) {
+      throw new ConflictException('Region exists with this name!')
+    }
+
+    await this.prisma.region.update({
+      where: {
+        id: id,
+      },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} region`
+  async remove(id: number): Promise<void> {
+    const regionExists = await this.prisma.region.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!regionExists) {
+      throw new NotFoundException('Region not found with given ID')
+    }
+
+    await this.prisma.region.update({
+      where: {
+        id: id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    })
   }
 }

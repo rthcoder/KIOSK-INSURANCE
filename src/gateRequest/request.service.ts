@@ -25,8 +25,6 @@ export class InfinityRequestService {
   async send() {
     const jsonPayload = this.getRequest()
 
-    console.log(jsonPayload)
-
     const url = this.getUrl()
     const authHeader = this.generateForAuth()
 
