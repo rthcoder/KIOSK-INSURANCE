@@ -14,3 +14,9 @@ export type { GetInsuranceIds } from './request.interface'
 export type { LoginResponse, LoginRequest } from './auth.interface'
 export type { JwtModel } from './jwt.interaface'
 export type { CreateBankRequest, UpdateBankRequest } from './bank.interface'
+export type {
+  CreateRegionRequest,
+  UpdateRegionRequest,
+  FindAllRegionResponse,
+  FindOneRegionResponse,
+} from './region.interface'

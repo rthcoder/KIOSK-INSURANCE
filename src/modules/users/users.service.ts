@@ -11,34 +11,32 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.prisma.user.findFirst(
-      {
-        where: {
-          id: id
-        }
-      }
-    )
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: id,
+      },
+    })
 
-    if(!user) {
+    if (!user) {
       throw new NotFoundException('User not found with given ID')
     }
     return user
   }
 
-  async create(data: any):Promise<void> {
+  async create(data: any): Promise<void> {
     await this.prisma.user.create({
       data,
-    });
+    })
   }
 
-  async update(id: number, data: any):Promise<void> {
+  async update(id: number, data: any): Promise<void> {
     await this.prisma.user.update({
       where: { id },
       data: {
         ...data,
-        updateAt: new Date()
+        updateAt: new Date(),
       },
-    });
+    })
   }
 
   async delete(id: number) {
@@ -47,20 +45,19 @@ export class UsersService {
       data: {
         deletedAt: new Date(),
       },
-    });
+    })
 
-    return user;
+    return user
   }
-
 
   async validate(data: any) {
     const user = await this.prisma.user.findFirst({
       where: {
         email: data.email,
         deletedAt: {
-          equals: null
-        }
-      }
+          equals: null,
+        },
+      },
     })
 
     if (!user) {

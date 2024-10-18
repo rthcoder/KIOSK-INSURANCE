@@ -7,7 +7,7 @@ import { LoginResponse } from '@interfaces'
 @ApiTags('Auth')
 @Controller({
   version: '1',
-  path: 'auth'
+  path: 'auth',
 })
 export class AuthController {
   constructor(private readonly service: AuthService) {}

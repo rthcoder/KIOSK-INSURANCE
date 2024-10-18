@@ -1,26 +1,65 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRegionDto } from './dto/create-region.dto';
-import { UpdateRegionDto } from './dto/update-region.dto';
-
+import { Injectable } from '@nestjs/common'
+import { CreateRegionRequest, FindAllRegionResponse, FindOneRegionResponse } from '@interfaces'
+import { PrismaService } from 'prisma/prisma.service'
 @Injectable()
 export class RegionService {
-  create(createRegionDto: CreateRegionDto) {
-    return 'This action adds a new region';
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll(): Promise<FindAllRegionResponse> {
+    const regions = await this.prisma.region.findMany({
+      where: {
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    const result = []
+
+    for (const region of regions) {
+      result?.push({
+        id: region?.id,
+        name: region?.name,
+        status: region?.status,
+        createdAt: region?.createdAt,
+      })
+    }
+
+    return {
+      data: result,
+    }
   }
 
-  findAll() {
-    return `This action returns all region`;
+  async findOne(id: number): Promise<FindOneRegionResponse> {
+    const region = await this.prisma.region.findFirst({
+      where: {
+        id: id,
+      },
+    })
+
+    const result = {
+      id: region?.id,
+      name: region?.name,
+      status: region?.status,
+      createdAt: region?.createdAt,
+    }
+
+    return {
+      data: result,
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} region`;
+  async create(data: CreateRegionRequest) {
+    const newRegion = await this.prisma.region.create({
+      data: data,
+    })
   }
 
-  update(id: number, updateRegionDto: UpdateRegionDto) {
-    return `This action updates a #${id} region`;
+  update(id: number, updateRegionDto: any) {
+    return `This action updates a #${id} region`
   }
 
   remove(id: number) {
-    return `This action removes a #${id} region`;
+    return `This action removes a #${id} region`
   }
 }
