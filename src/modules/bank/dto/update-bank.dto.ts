@@ -1,4 +1,16 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateBankDto } from './create-bank.dto';
+import { IsString, IsNumber, IsPositive, IsOptional } from 'class-validator';
+import { UpdateBankRequest } from '@interfaces'
 
-export class UpdateBankDto extends PartialType(CreateBankDto) {}
+export class UpdateBankDTO implements UpdateBankRequest {
+  @IsOptional()
+  @IsString()
+  name: string; 
+
+  @IsOptional()
+  @IsString()
+  percentage: number;
+  
+  @IsOptional()
+  @IsString()
+  regionId: number;
+}

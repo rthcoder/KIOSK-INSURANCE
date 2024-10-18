@@ -1,16 +1,17 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { BankService } from './bank.service';
-import { CreateBankDto } from './dto/create-bank.dto';
-import { UpdateBankDto } from './dto/update-bank.dto';
+import { CreateBankDTO } from './dto';
+import { UpdateBankDTO } from './dto/update-bank.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('bank')
+@ApiTags('Bank Service')
+@Controller({
+  version: '1',
+  path: 'bank'
+})
+
 export class BankController {
   constructor(private readonly bankService: BankService) {}
-
-  @Post()
-  create(@Body() createBankDto: CreateBankDto) {
-    return this.bankService.create(createBankDto);
-  }
 
   @Get()
   findAll() {
@@ -22,8 +23,13 @@ export class BankController {
     return this.bankService.findOne(+id);
   }
 
+  @Post()
+  create(@Body() createBankDto: CreateBankDTO) {
+    return this.bankService.create(createBankDto);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBankDto: UpdateBankDto) {
+  update(@Param('id') id: string, @Body() updateBankDto: UpdateBankDTO) {
     return this.bankService.update(+id, updateBankDto);
   }
 
