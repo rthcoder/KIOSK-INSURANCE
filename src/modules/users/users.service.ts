@@ -23,6 +23,15 @@ export class UsersService {
     return user
   }
 
+  // name
+  // email
+  // password
+  // code // generation bo'ladi
+  // role
+  // structureId
+  // incasatorId
+  //user create bo'lish uchun shu malumotlarni create qilish kerak bo'ladi. user role qarab kerakli malumotlar qo'shiladi. ovqatlangandan keyin qilaman.
+
   async create(data: any): Promise<void> {
     await this.prisma.user.create({
       data,

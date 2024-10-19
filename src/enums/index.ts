@@ -1,4 +1,5 @@
 export * from './psp-method-list'
+export * from './user-roles-enum'
 export * from './error-codes.enum'
 export * from './language-code.enum'
 export * from './http-statuses.enum'

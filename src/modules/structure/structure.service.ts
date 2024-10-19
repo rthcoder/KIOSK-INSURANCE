@@ -69,7 +69,7 @@ export class StructureService {
       throw new NotFoundException('Region not found with given ID!')
     }
 
-    const newStructure = await this.prisma.structure.create({
+    await this.prisma.structure.create({
       data: data,
     })
   }

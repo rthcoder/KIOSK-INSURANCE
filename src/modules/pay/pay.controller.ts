@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common'
+import { Controller, Post, Body } from '@nestjs/common'
 import { PayService } from './pay.service'
 import { ApiTags } from '@nestjs/swagger'
 

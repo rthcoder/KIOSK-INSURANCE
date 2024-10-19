@@ -1,7 +1,7 @@
 import { jwtConstants } from '@constants'
 import { LoginRequest, LoginResponse } from '@interfaces'
 import { UsersService } from '@modules'
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { signJwt } from 'helpers/jwt.helper'
 import { PrismaService } from 'prisma/prisma.service'
 
@@ -21,6 +21,10 @@ export class AuthService {
         id: user.id,
       },
     })
+
+    if (!checkUser) {
+      throw new NotFoundException('user not found')
+    }
 
     if (data.password !== user.password) {
       throw new UnauthorizedException('Invalid credentials')

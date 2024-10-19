@@ -8,9 +8,9 @@ generator client {
 }
 
 enum UserRole {
-  OPERATOR
-  INCASATOR
-  ACCOUNTANT
+  operator
+  incasator
+  accountant
 }
 
 // enum UserStatus {

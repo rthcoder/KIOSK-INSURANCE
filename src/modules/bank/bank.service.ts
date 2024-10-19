@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
 import { CreateBankRequest, UpdateBankRequest } from '@interfaces'
 import { FilterService } from '@helpers'
@@ -9,8 +9,6 @@ export class BankService {
 
   async findAll(query: any) {
     const { limit, sort, filters } = query
-
-    const parsedLimit = parseInt(limit, 10)
 
     const parsedSort = sort ? JSON?.parse(sort) : {}
 

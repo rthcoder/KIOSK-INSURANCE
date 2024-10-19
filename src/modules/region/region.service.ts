@@ -73,7 +73,7 @@ export class RegionService {
       throw new ConflictException('Region exists with this name!')
     }
 
-    const newRegion = await this.prisma.region.create({
+    await this.prisma.region.create({
       data: data,
     })
   }
