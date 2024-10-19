@@ -94,7 +94,7 @@ export class StructureService {
       throw new NotFoundException('Structure not found with given ID')
     }
 
-    if (structureNameExists) {
+    if (data?.name && structureNameExists) {
       throw new ConflictException('Structure exists with this name!')
     }
 
