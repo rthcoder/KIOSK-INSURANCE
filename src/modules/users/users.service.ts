@@ -1,68 +1,286 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { CreateUserRequest } from '@interfaces'
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
+import { UserRoles } from '@enums'
+import * as bcrypt from 'bcrypt'
+import { FilterService } from '@helpers'
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    const users = await this.prisma.user.findMany()
-    return users
+  async findAll(query: any) {
+    const { limit, sort, filters } = query
+
+    const parsedLimit = parseInt(limit, 10)
+
+    const parsedSort = sort ? JSON?.parse(sort) : {}
+
+    const parsedFilters = filters ? JSON?.parse(filters) : []
+
+    const regions = await FilterService?.applyFilters('user', parsedFilters, parsedSort)
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+    return {
+      data: users,
+    }
+  }
+
+  async getOperators() {
+    const operators = await this.prisma.user.findMany({
+      where: {
+        role: UserRoles.OPERATOR,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+    return operators
+  }
+
+  async getAccountans() {
+    const accountant = await this.prisma.user.findMany({
+      where: {
+        role: UserRoles.ACCOUNTANT,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+    return accountant
+  }
+
+  async getIncasators() {
+    const incasators = await this.prisma.user.findMany({
+      where: {
+        role: UserRoles.INCASATOR,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+    return incasators
   }
 
   async findOne(id: number) {
     const user = await this.prisma.user.findFirst({
       where: {
         id: id,
+        deletedAt: {
+          equals: null,
+        },
       },
     })
 
     if (!user) {
       throw new NotFoundException('User not found with given ID')
     }
-    return user
+    return {
+      data: user,
+    }
   }
 
-  // name
-  // email
-  // password
-  // code // generation bo'ladi
-  // role
-  // structureId
-  // incasatorId
-  //user create bo'lish uchun shu malumotlarni create qilish kerak bo'ladi. user role qarab kerakli malumotlar qo'shiladi. ovqatlangandan keyin qilaman.
-
   async create(data: any): Promise<void> {
+    const saltOrRounds = 10
+
+    const userExists = await this.prisma.user.findFirst({
+      where: {
+        login: data?.login,
+      },
+    })
+
+    if (userExists) {
+      throw new ConflictException('This login already in use!')
+    }
+
+    if (data.login.length > 15) {
+      throw new BadRequestException('Login must be less than 15 characters')
+    }
+
+    if (data.login.length < 8) {
+      throw new BadRequestException('Login must be more than 8 characters')
+    }
+
+    if (data.password.length > 12) {
+      throw new BadRequestException('Password must be less than 12 characters')
+    }
+
+    if (data.password.length < 6) {
+      throw new BadRequestException('Password must be more than 6 characters')
+    }
+
+    if (!Object.values(UserRoles).includes(data.role as UserRoles)) {
+      throw new Error('Role not found')
+    }
+
+    const count = await this.prisma.user.count({
+      where: {
+        role: data.role,
+      },
+    })
+
+    const roleCapitalLetter = data.role
+      .split('_')
+      .map((c: string, index: number, array: string[]) => {
+        if (array.length > 1) {
+          return c.charAt(0).toLocaleUpperCase()
+        } else {
+          return c.charAt(0).toLocaleUpperCase() + c.charAt(1).toLocaleUpperCase()
+        }
+      })
+      .join('')
+
+    const code = `${roleCapitalLetter}${count + 1}`
+
+    const hashedPassword = await bcrypt.hash(data.password, saltOrRounds)
+
     await this.prisma.user.create({
-      data,
+      data: {
+        name: data?.name,
+        login: data?.login,
+        password: hashedPassword,
+        code: code,
+        role: data?.role,
+      },
     })
   }
 
   async update(id: number, data: any): Promise<void> {
+    const userExists = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    console.log(userExists)
+
+    if (!userExists) {
+      throw new NotFoundException('User not found with given ID!')
+    }
+
+    if (data.login && data.login.length > 15) {
+      throw new BadRequestException('Login must be less than 15 characters!')
+    }
+
+    if (data.login && data.login.length < 8) {
+      throw new BadRequestException('Login must be more than 8 characters!')
+    }
+
+    if (data.password && data.password.length > 12) {
+      throw new BadRequestException('Password must be less than 12 characters!')
+    }
+
+    if (data.password && data.password.length < 6) {
+      throw new BadRequestException('Password must be more than 6 characters!')
+    }
+
+    if (data.role && !Object.values(UserRoles).includes(data.role as UserRoles)) {
+      throw new NotFoundException('Role not found!')
+    }
+
+    if (data.login && data.login !== userExists.login) {
+      const loginTaken = await this.prisma.user.findFirst({
+        where: {
+          login: data.login,
+          id: {
+            not: id,
+          },
+          deletedAt: {
+            equals: null,
+          },
+        },
+      })
+
+      if (loginTaken) {
+        throw new ConflictException('This login already in use by another user!')
+      }
+    }
+
+    let hashedPassword = userExists.password
+    if (data.password) {
+      const saltOrRounds = 10
+      hashedPassword = await bcrypt.hash(data.password, saltOrRounds)
+    }
+
+    let code = userExists.code
+    if (data.role && data.role !== userExists.role) {
+      const count = await this.prisma.user.count({
+        where: {
+          role: data.role,
+          deletedAt: {
+            equals: null,
+          },
+        },
+      })
+
+      const roleCapitalLetter = data.role
+        .split('_')
+        .map((c: string, index: number, array: string[]) => {
+          if (array.length > 1) {
+            return c.charAt(0).toLocaleUpperCase()
+          } else {
+            return c.charAt(0).toLocaleUpperCase() + c.charAt(1).toLocaleUpperCase()
+          }
+        })
+        .join('')
+
+      code = `${roleCapitalLetter}${count + 1}`
+    }
+
     await this.prisma.user.update({
-      where: { id },
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
       data: {
-        ...data,
-        updateAt: new Date(),
+        name: data?.name || userExists.name,
+        login: data?.login || userExists.login,
+        password: hashedPassword,
+        code: code,
+        role: data?.role || userExists.role,
       },
     })
   }
 
   async delete(id: number) {
-    const user = await this.prisma.user.update({
-      where: { id },
+    const userExists = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!userExists) {
+      throw new NotFoundException('User not found with given ID!')
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: id,
+      },
       data: {
         deletedAt: new Date(),
       },
     })
-
-    return user
   }
 
   async validate(data: any) {
     const user = await this.prisma.user.findFirst({
       where: {
-        email: data.email,
+        login: data.email,
         deletedAt: {
           equals: null,
         },
@@ -75,7 +293,7 @@ export class UsersService {
 
     return {
       id: user?.id,
-      login: user?.email,
+      login: user?.login,
       password: user?.password,
     }
   }

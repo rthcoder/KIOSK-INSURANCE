@@ -22,3 +22,4 @@ export type {
 } from './region.interface'
 
 export type { CreateStructureRequest, UpdateStructureRequest } from './structure.interface'
+export type { CreateUserRequest } from './user.interface'

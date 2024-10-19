@@ -22,7 +22,7 @@ enum UserRole {
 model User {
   id        Int       @id @default(autoincrement())
   name      String
-  email     String
+  login     String
   password  String
   code      String
   role      UserRole
@@ -42,7 +42,7 @@ model User {
   userBalances UserBalance[]
   Transaction  Transaction[]
 
-  @@unique([code, email])
+  @@unique([code, login])
   @@index([code, status, cashCount, latitude, longitude, structureId, incasatorId, createdAt])
   @@map("users")
 }

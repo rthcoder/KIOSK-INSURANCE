@@ -1,9 +1,10 @@
+import { LoginRequest } from '@interfaces'
 import { IsNotEmpty, IsString } from 'class-validator'
 
-export class LoginDtoRequest {
+export class LoginDtoRequest implements LoginRequest {
   @IsString()
   @IsNotEmpty()
-  email: string
+  login: string
 
   @IsString()
   @IsNotEmpty()
