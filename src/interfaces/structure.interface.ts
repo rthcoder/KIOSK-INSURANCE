@@ -7,5 +7,5 @@ export interface CreateStructureRequest {
 export interface UpdateStructureRequest {
   name?: string
   status?: number
-  region_id?: number
+  regionId?: number
 }

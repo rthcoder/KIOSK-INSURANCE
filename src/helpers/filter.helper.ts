@@ -13,13 +13,11 @@ export class FilterService {
       orderBy: {},
     }
 
-    // Filtrlarni qo'llash
     filters.forEach((filter) => {
       if (filter.operator === 'between' && filter.column === 'createdAt') {
-        // 'between' operatorini tekshirish
         const date = filter.value.split('_')
         if (date.length !== 2) {
-          return // Date formati noto'g'ri bo'lsa, o'tkazib yuboriladi
+          return
         }
 
         query.where = {
@@ -30,8 +28,6 @@ export class FilterService {
           },
         }
       } else if (filter.operator === 'to' && filter.column === 'createdAt') {
-        // 'to' operatori uchun createdAt gacha bo'lgan yozuvlarni olish
-
         query.where = {
           ...query.where,
           createdAt: {
@@ -40,7 +36,7 @@ export class FilterService {
         }
       } else {
         if (filter.value === null || filter.value === '') {
-          return // Bo'sh qiymatlar uchun filtrlarni o'tkazib yuboramiz
+          return
         }
 
         if (typeof filter.value === 'number' || filter.value == 0) {
@@ -54,27 +50,31 @@ export class FilterService {
           query.where = {
             ...query.where,
             [filter.column]: {
-              contains: filter.value.slice(0, 11),
-              mode: 'insensitive', // Katta-kichik harfga e'tibor bermaslik uchun
+              contains: filter.value,
+              mode: 'insensitive',
             },
           }
         }
       }
     })
 
-    // Sortlash
     if (sort && sort.column && sort.value) {
       query.orderBy = {
         [sort.column]: sort.value,
       }
     } else {
       query.orderBy = {
-        id: 'desc', // Default tartiblash
+        id: 'desc',
       }
     }
 
-    // Dinamik model nomidan foydalanib so'rov yuborish
-    const model: any = prisma[modelName as keyof PrismaClient] // Prisma modeliga dinamik kirish
-    return model['findMany'](query) // 'findMany' metodini dinamik ravishda chaqirish
+    query.where = {
+      deletedAt: {
+        equals: null,
+      },
+    }
+
+    const model: any = prisma[modelName as keyof PrismaClient]
+    return model['findMany'](query)
   }
 }

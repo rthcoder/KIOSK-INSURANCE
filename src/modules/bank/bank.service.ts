@@ -1,35 +1,127 @@
-import { Injectable } from '@nestjs/common'
-import { CreateBankRequest, UpdateBankRequest } from '@interfaces'
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
+import { CreateBankRequest, UpdateBankRequest } from '@interfaces'
+import { FilterService } from '@helpers'
 
 @Injectable()
 export class BankService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    const banks = await this.prisma.bank.findMany({
+  async findAll(query: any) {
+    const { limit, sort, filters } = query
+
+    const parsedLimit = parseInt(limit, 10)
+
+    const parsedSort = sort ? JSON?.parse(sort) : {}
+
+    const parsedFilters = filters ? JSON?.parse(filters) : []
+
+    const banks = await FilterService?.applyFilters('bank', parsedFilters, parsedSort)
+
+    return {
+      data: banks,
+    }
+  }
+
+  async findOne(id: number) {
+    const bank = await this.prisma.bank.findUnique({
       where: {
+        id: id,
+        deletedAt: null,
+      },
+    })
+
+    if (!bank) {
+      throw new NotFoundException(`Bank not found with given ID`)
+    }
+
+    return {
+      data: bank,
+    }
+  }
+
+  async create(data: CreateBankRequest): Promise<void> {
+    const regionExists = await this.prisma.region.findUnique({
+      where: {
+        id: data?.regionId,
         deletedAt: {
           equals: null,
         },
       },
     })
-    return banks
+
+    if (!regionExists) {
+      throw new NotFoundException('Region not found with given ID!')
+    }
+
+    await this.prisma.bank.create({
+      data: {
+        name: data?.name,
+        regionId: data?.regionId,
+        percentage: data?.percentage,
+      },
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} bank`
+  async update(id: number, data: UpdateBankRequest) {
+    const bankExists = await this.prisma.bank.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!bankExists) {
+      throw new NotFoundException(`Bank not found with given ID`)
+    }
+
+    const regionExists = await this.prisma.region.findUnique({
+      where: {
+        id: data?.regionId,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (data.regionId && !regionExists) {
+      throw new NotFoundException('Region not found with given ID!')
+    }
+
+    return this.prisma.bank.update({
+      where: {
+        id: id,
+      },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    })
   }
 
-  create(createBankDto: CreateBankRequest) {
-    return 'This action adds a new bank'
-  }
+  async remove(id: number) {
+    const bankExists = await this.prisma.bank.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
 
-  update(id: number, updateBankDto: UpdateBankRequest) {
-    return `This action updates a #${id} bank`
-  }
+    if (!bankExists) {
+      throw new NotFoundException(`Bank not found with given ID!`)
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} bank`
+    await this.prisma.bank.update({
+      where: {
+        id: id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    })
   }
 }

@@ -74,11 +74,75 @@ export class StructureService {
     })
   }
 
-  update(id: number, data: UpdateStructureRequest) {
-    return `This action updates a #${id} structure`
+  async update(id: number, data: UpdateStructureRequest): Promise<void> {
+    const structureExists = await this.prisma.structure.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    const structureNameExists = await this.prisma.structure.findFirst({
+      where: {
+        name: data?.name,
+      },
+    })
+
+    if (!structureExists) {
+      throw new NotFoundException('Structure not found with given ID')
+    }
+
+    if (structureNameExists) {
+      throw new ConflictException('Structure exists with this name!')
+    }
+
+    const regionExists = await this.prisma.region.findUnique({
+      where: {
+        id: data?.regionId,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!regionExists) {
+      throw new NotFoundException('Region not found with given ID!')
+    }
+
+    await this.prisma.structure.update({
+      where: {
+        id: id,
+      },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} structure`
+  async remove(id: number): Promise<void> {
+    const structureExists = await this.prisma.structure.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!structureExists) {
+      throw new NotFoundException('Structure not found with given ID')
+    }
+
+    await this.prisma.structure.update({
+      where: {
+        id: id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    })
   }
 }

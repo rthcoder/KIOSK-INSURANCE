@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common'
 import { BankService } from './bank.service'
 import { CreateBankDTO } from './dto'
 import { UpdateBankDTO } from './dto/update-bank.dto'
@@ -13,8 +13,8 @@ export class BankController {
   constructor(private readonly bankService: BankService) {}
 
   @Get()
-  findAll() {
-    return this.bankService.findAll()
+  findAll(@Query() query: any) {
+    return this.bankService.findAll(query)
   }
 
   @Get(':id')

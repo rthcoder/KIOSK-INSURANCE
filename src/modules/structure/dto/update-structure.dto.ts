@@ -8,7 +8,7 @@ export class UpdateStructureDTO implements UpdateStructureRequest {
 
   @IsOptional()
   @IsNumber()
-  region_id?: number
+  regionId?: number
 
   @IsOptional()
   @IsNumber()

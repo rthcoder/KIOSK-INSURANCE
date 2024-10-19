@@ -17,17 +17,6 @@ export class RegionService {
 
     const regions = await FilterService?.applyFilters('region', parsedFilters, parsedSort)
 
-    // const regions = await this.prisma.region.findMany({
-    //   where: {
-    //     deletedAt: {
-    //       equals: null,
-    //     },
-    //   },
-    //   orderBy: {
-    //     createdAt: 'asc', //xozircha ketin filtrga qarab o'zgaradi hammasi
-    //   },
-    // })
-
     const result = []
 
     for (const region of regions) {

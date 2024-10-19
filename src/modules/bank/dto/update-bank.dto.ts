@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator'
+import { IsString, IsOptional, IsNumber } from 'class-validator'
 import { UpdateBankRequest } from '@interfaces'
 
 export class UpdateBankDTO implements UpdateBankRequest {
@@ -11,6 +11,6 @@ export class UpdateBankDTO implements UpdateBankRequest {
   percentage: number
 
   @IsOptional()
-  @IsString()
+  @IsNumber()
   regionId: number
 }

@@ -120,7 +120,7 @@ model Region {
 model Bank {
   id         Int       @id @default(autoincrement())
   name       String
-  percentage Decimal   @default(0.0) @db.Decimal(2, 2)
+  percentage Decimal   @default(0.0) @db.Decimal(7, 2)
   regionId   Int       @map("region_id")
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime? @map("updated_at")
