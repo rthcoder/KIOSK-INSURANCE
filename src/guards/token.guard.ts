@@ -9,7 +9,7 @@ import { CustomRequest } from 'custom/request.custom'
 import { PrismaService } from 'prisma/prisma.service'
 
 @Injectable()
-export class CheckPermissionGuard implements CanActivate {
+export class CheckTokenGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly prisma: PrismaService,

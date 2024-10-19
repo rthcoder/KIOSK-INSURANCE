@@ -52,10 +52,10 @@ model Insurance {
   anketaId    String
   amount      BigInt
   status      String
-  createResId Int       @map("create_res_id")
-  polisId     String    @map("polis_id")
+  createResId Int?      @map("create_res_id")
+  polisId     Int       @map("polis_id")
   orderId     String    @map("order_id")
-  vendorId    String    @map("vendor_id")
+  vendorId    Int       @map("vendor_id")
   request     Json?
   response    Json?
   data        Json?

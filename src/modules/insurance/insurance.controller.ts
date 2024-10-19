@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { InsuranceService } from './insurance.service'
 import {
@@ -9,6 +9,8 @@ import {
   StepThreeRequestDto,
   StepTwoRequestDTO,
 } from './dto'
+import { CheckTokenGuard } from 'guards'
+import { CustomRequest } from 'custom'
 
 @ApiTags('Company Service')
 @Controller({
@@ -59,9 +61,11 @@ export class InsuranceController {
     return result
   }
 
+  @UseGuards(CheckTokenGuard)
   @Post('create-insurance')
-  async createInvoice(@Body() createInvoiceDto: any) {
-    const result = await this.insuranceService.createInsurance(createInvoiceDto)
+  async createInvoice(@Body() createInvoiceDto: any, @Req() request: CustomRequest) {
+    const userId = request?.user?.id
+    const result = await this.insuranceService.createInsurance(createInvoiceDto, userId)
     return result
   }
 }

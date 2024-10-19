@@ -36,12 +36,42 @@ export class InsuranceService {
     return result.getResponse()
   }
 
-  async createInsurance(data: any) {
+  async createInsurance(data: any, userId: any) {
     const result = await this.insuranceGateService.createInsurance(
       data,
       process.env.QUICKPAY_SERVICE_ID,
       process.env.QUICKPAY_SERVICE_KEY,
     )
-    return result.getResponse()
+    // const response = result.getResponse()
+    const { anketa_id, order_id, polis_id, vendor_id } = result?.getInsuranceIds()
+
+    console.log(typeof userId)
+
+    const newInsurance = await this.prisma.insurance.create({
+      data: {
+        anketaId: anketa_id,
+        status: 'created',
+        polisId: polis_id,
+        orderId: order_id,
+        vendorId: vendor_id,
+        userId: userId,
+        companyId: 1,
+        serviceId: 1,
+        amount: 1000,
+        createResId: 1,
+      },
+    })
+
+    /*
+    id
+    anketaId
+    status
+    polisId
+    orderId
+    vendorId
+    userId
+    companyId
+    serviceId
+    */
   }
 }
