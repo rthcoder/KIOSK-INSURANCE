@@ -1,7 +1,7 @@
 import { CreateUserRequest } from '@interfaces'
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from 'prisma/prisma.service'
-import { UserRoles } from '@enums'
+import { UserRoles, UserRolesOutPut } from '@enums'
 import * as bcrypt from 'bcrypt'
 import { FilterService } from '@helpers'
 
@@ -27,6 +27,12 @@ export class UsersService {
         },
       },
     })
+
+    const usersWithRoles = users.map((user) => ({
+      ...user,
+      role: UserRolesOutPut[UserRoles[user.role] as keyof typeof UserRolesOutPut],
+    }))
+
     return {
       data: users,
     }
@@ -115,8 +121,8 @@ export class UsersService {
       throw new BadRequestException('Password must be more than 6 characters')
     }
 
-    if (!Object.values(UserRoles).includes(data.role as UserRoles)) {
-      throw new Error('Role not found')
+    if (!Object.values(UserRoles).includes(data.role)) {
+      throw new NotFoundException('Role not found!')
     }
 
     const count = await this.prisma.user.count({
@@ -125,16 +131,9 @@ export class UsersService {
       },
     })
 
-    const roleCapitalLetter = data.role
-      .split('_')
-      .map((c: string, index: number, array: string[]) => {
-        if (array.length > 1) {
-          return c.charAt(0).toLocaleUpperCase()
-        } else {
-          return c.charAt(0).toLocaleUpperCase() + c.charAt(1).toLocaleUpperCase()
-        }
-      })
-      .join('')
+    const roleKey = Object.keys(UserRoles).find((key) => UserRoles[key as keyof typeof UserRoles] === data.role)
+
+    const roleCapitalLetter = roleKey?.substring(0, 2).toUpperCase()
 
     const code = `${roleCapitalLetter}${count + 1}`
 

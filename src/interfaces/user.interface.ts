@@ -2,7 +2,7 @@ export interface CreateUserRequest {
   name: string
   login: string
   password: string
-  role: string
+  role: number
   structureId: number
   incasatorId: number
   latitude?: string

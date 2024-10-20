@@ -45,8 +45,6 @@ export class InsuranceService {
     // const response = result.getResponse()
     const { anketa_id, order_id, polis_id, vendor_id } = result?.getInsuranceIds()
 
-    console.log(typeof userId)
-
     const newInsurance = await this.prisma.insurance.create({
       data: {
         anketaId: anketa_id,

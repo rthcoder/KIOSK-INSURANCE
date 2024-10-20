@@ -1,5 +1,5 @@
 import { CreateUserRequest } from '@interfaces'
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator'
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class CreateUserDTO implements CreateUserRequest {
   @IsNotEmpty()
@@ -14,7 +14,7 @@ export class CreateUserDTO implements CreateUserRequest {
   @IsString()
   password: string
 
-  role: string
+  role: number
 
   @IsNotEmpty()
   @IsNumber()
@@ -24,11 +24,11 @@ export class CreateUserDTO implements CreateUserRequest {
   @IsNumber()
   incasatorId: number
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   latitude?: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   longitude?: string
 }

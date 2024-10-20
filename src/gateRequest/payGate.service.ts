@@ -22,9 +22,3 @@ export class PayGate extends InfinityRequestService {
       .send()
   }
 }
-
-// "order_id": "c5c6d04a-c4ad-4d93-a453-8527b7c151b4",
-// "anketa_id": "901416",
-// "polis_id": 141,
-//         "vendor_id": 105458,
-//         "anketa_id": "901416"

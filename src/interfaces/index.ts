@@ -23,3 +23,4 @@ export type {
 
 export type { CreateStructureRequest, UpdateStructureRequest } from './structure.interface'
 export type { CreateUserRequest } from './user.interface'
+export type { CreateDepositRequest } from './deposit.interface'

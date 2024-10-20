@@ -133,24 +133,6 @@ export class InfinityRequestService {
     return this.response?.result || []
   }
 
-  // {
-  //   id: 146,
-  //   order_id: 'fd2ef155-4b04-4eef-959d-3fd45da65153',
-  //   anketa_id: '901525',
-  //   polis_id: 146,
-  //   pay: {
-  //     endpoint_url: 'https://agr.uz/gateway',
-  //     protocol: 'json-rpc',
-  //     params: { vendor_id: 105458, anketa_id: '901525' },
-  //     methods: [
-  //       'pam.pay_by_cash',
-  //       'pam.prepare_pay',
-  //       'pam.prepare_pay_by_id',
-  //       'pam.pay_by_id'
-  //     ]
-  //   }
-  // }
-
   getInsuranceIds(): GetInsuranceIds {
     const result = {
       order_id: this?.response?.result?.order_id,

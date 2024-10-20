@@ -5,7 +5,6 @@ import { GetServiceRequest } from '@interfaces'
 
 @Injectable()
 export class InsuranceGateService extends InfinityRequestService {
-  // findCompany metodi
   async findCompany(serviceId: string, serviceKey: string) {
     return this.setServiceId(serviceId)
       .setServiceKey(serviceKey)
@@ -15,7 +14,6 @@ export class InsuranceGateService extends InfinityRequestService {
       .send()
   }
 
-  // findService metodi
   async findService(data: GetServiceRequest, serviceId: string, serviceKey: string) {
     return this.setServiceId(serviceId)
       .setServiceKey(serviceKey)
@@ -25,7 +23,6 @@ export class InsuranceGateService extends InfinityRequestService {
       .send()
   }
 
-  // getStep metodi
   async getStep(data: any, serviceId: string, serviceKey: string) {
     return this.setServiceId(serviceId)
       .setServiceKey(serviceKey)

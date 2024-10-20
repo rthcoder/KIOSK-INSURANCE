@@ -13,7 +13,6 @@ import {
 } from '@modules'
 import { pspConfig } from '@config'
 import { AuthModule } from 'auth/auth.module'
-// Import boshqa modullar
 
 @Module({
   imports: [
