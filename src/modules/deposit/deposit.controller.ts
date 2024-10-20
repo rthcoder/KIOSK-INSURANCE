@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common'
 import { DepositService } from './deposit.service'
 import { CreateDepositDTO } from './dto'
 import { ApiTags } from '@nestjs/swagger'
+import { CheckTokenGuard } from 'guards'
+import { CustomRequest } from 'custom'
 
 @ApiTags('Deposits Service')
 @Controller({
@@ -21,9 +23,10 @@ export class DepositController {
     return this.depositService.findOne(+id)
   }
 
+  @UseGuards(CheckTokenGuard)
   @Post()
-  create(@Body() createDepositDto: CreateDepositDTO) {
-    return this.depositService.create(createDepositDto)
+  create(@Body() createDepositDto: CreateDepositDTO, @Req() request: CustomRequest) {
+    return this.depositService.create(createDepositDto, request?.user?.id)
   }
 
   @Patch(':id')

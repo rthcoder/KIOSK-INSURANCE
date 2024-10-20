@@ -182,7 +182,7 @@ model Transaction {
 model UserBalanceHistory {
   id     Int     @id @default(autoincrement())
   userId Int
-  amount BigInt?
+  amount BigInt? @default(0)
   type   Int     @default(0)
 
   createdAt DateTime? @default(now())
@@ -191,5 +191,6 @@ model UserBalanceHistory {
 
   user User @relation(fields: [userId], references: [id])
 
+  @@unique([id, userId])
   @@map("user_balance_history")
 }

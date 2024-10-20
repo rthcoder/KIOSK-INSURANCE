@@ -1,25 +1,71 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { CreateDepositRequest } from '@interfaces'
+import { PrismaService } from 'prisma/prisma.service'
+import { CustomRequest } from 'custom'
 
 @Injectable()
 export class DepositService {
-  create(data: CreateDepositRequest) {
-    return 'This action adds a new deposit'
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll() {
+  async findAll() {
     return `This action returns all deposit`
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return `This action returns a #${id} deposit`
   }
 
-  update(id: number, data: any) {
+  async create(data: CreateDepositRequest, incasatorId: number) {
+    const opearatorExists = await this.prisma.user.findUnique({
+      where: {
+        id: data?.operatorId,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!opearatorExists) {
+      throw new NotFoundException('Operator not found!')
+    }
+
+    const newDoposit = await this.prisma.deposit.create({
+      data: {
+        operatorId: data?.operatorId,
+        incasatorId: incasatorId,
+      },
+    })
+
+    // if (newDoposit) {
+    //   return
+    // }
+
+    await this.prisma.user.update({
+      where: {
+        id: data?.operatorId,
+      },
+      data: {
+        cashCount: 0,
+      },
+    })
+
+    await this.prisma.userBalance.updateMany({
+      where: {
+        userId: data?.operatorId,
+      },
+      data: {
+        balance: 0,
+      },
+    })
+
+    return 1
+  }
+
+  async update(id: number, data: any) {
     return `This action updates a #${id} deposit`
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} deposit`
   }
 }

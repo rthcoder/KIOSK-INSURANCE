@@ -8,6 +8,7 @@ import {
   PayModule,
   BankModule,
   RegionModule,
+  DepositModule,
   PartnerModule,
   StructureModule,
 } from '@modules'
@@ -30,6 +31,7 @@ import { AuthModule } from 'auth/auth.module'
     RegionModule,
     PartnerModule,
     StructureModule,
+    DepositModule,
   ],
   controllers: [],
   providers: [],
