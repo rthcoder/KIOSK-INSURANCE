@@ -39,7 +39,66 @@ export class InfinityRequestService {
         }),
       )
 
-      this.response = response.data
+      // this.response = response.data
+      // this.response = {
+      //   "id": 207,
+      //   "error": null,
+      //   "result": {
+      //     "masked_phone_number": "+99890*****50",
+      //     "time_out": 120,
+      //     "confirm_form": [
+      //       {
+      //         "label": "Код подтверждения",
+      //         "key": "confirmation_code",
+      //         "element": "input",
+      //         "type": "int",
+      //         "value": "",
+      //         "mask": "######",
+      //         "regex": "^[0-9]{6}$",
+      //         "placeholder": "",
+      //         "size": 6,
+      //         "order": 10,
+      //         "is_required": 1
+      //       },
+      //       {
+      //         "key": "bank_transaction_id",
+      //         "value": 6236,
+      //         "show": 0,
+      //         "is_required": 1
+      //       }
+      //     ],
+      //     "request_method": "pam.confirm_pay"
+      //   }
+      // }
+
+      // this.response = {
+      //   "method": "pam.confirm_pay",
+      //   "params": {
+      //     "confirm_form": {
+      //       "confirmation_code": "000000",
+      //       "bank_transaction_id": 127
+      //     }
+      //   },
+      //   "id": 207
+      // }
+
+      // this.response = {
+      //   "id": 207,
+      //   "error": null,
+      //   "result": {
+      //     "details": {
+      //       "id": "8g78g88d7gdq5ytq89utyq45",
+      //       "masked_card_number": "860053******9500",
+      //       "transaction_id": 4534534,
+      //       "bank_transaction_id": 6845346,
+      //       "reference_number": 5464563454,
+      //       "amount": 1000,
+      //       "merchantId": 33005329,
+      //       "terminalId": 33004331,
+      //       "date": 12425135346
+      //     }
+      //   }
+      // }
 
       if (!this.response) {
         this.setErrorUnknown({
@@ -155,15 +214,27 @@ export class InfinityRequestService {
     return !this.getError()
   }
 
-  // getResultSms(): any {
-  //   const confirmSms = this.getResult()?.confirm_form || [];
-  //   return confirmSms.find(item => item.key === 'transaction_id')?.value || null;
-  // }
+  getResultSms(): any {
+    const confirmSms = this.getResult()?.confirm_form || []
 
-  // getResultCheckPay(): any {
-  //   const result = this.getResult() || [];
-  //   return result.find(item => item.request_method === 'pam.prepare_pay') || null;
-  // }
+    if (!confirmSms || !Array.isArray(confirmSms)) {
+      throw new Error('confirm_form is not an array or is undefined.')
+    }
+
+    const foundItem = confirmSms.find((item) => item?.key === 'transaction_id')
+    return foundItem ? foundItem.value : null
+  }
+
+  getResultCheckPay(): any {
+    const result = this.getResult() || []
+
+    if (!result || !Array.isArray(result)) {
+      throw new Error('Result is not an array or is undefined.')
+    }
+
+    const foundItem = result.find((item) => item?.request_method === 'pam.prepare_pay')
+    return foundItem || null
+  }
 
   getDetails(): any {
     return this.response?.result?.details || []
