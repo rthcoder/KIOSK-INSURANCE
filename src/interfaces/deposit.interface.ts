@@ -4,8 +4,8 @@ export interface CreateDepositRequest {
 
 interface Deposit {
   id: number
-  amount: bigint
-  status: number
+  amount: number
+  status: string
   comment: string | null
   checkPhoto: string | null
   type: number

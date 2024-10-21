@@ -42,23 +42,7 @@ export class InsuranceService {
       process.env.QUICKPAY_SERVICE_ID,
       process.env.QUICKPAY_SERVICE_KEY,
     )
-    // const response = result.getResponse()
-    const { anketa_id, order_id, polis_id, vendor_id } = result?.getInsuranceIds()
-
-    const newInsurance = await this.prisma.insurance.create({
-      data: {
-        anketaId: anketa_id,
-        status: 'created',
-        polisId: polis_id,
-        orderId: order_id,
-        vendorId: vendor_id,
-        userId: userId,
-        companyId: 1,
-        serviceId: 1,
-        amount: 1000,
-        createResId: 1,
-      },
-    })
+    return result.getResponse()
 
     /*
     id

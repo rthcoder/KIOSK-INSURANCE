@@ -30,7 +30,7 @@ async function bootstrap() {
 
   // const logger = app.get(WinstonLoggerService)
   // app.useGlobalInterceptors(new LoggingInterceptor(logger))
-  app.useGlobalInterceptors(new BigIntInterceptor())
+  // app.useGlobalInterceptors(new BigIntInterceptor())
 
   app.useGlobalPipes(new ValidationPipe()),
     app.enableVersioning({

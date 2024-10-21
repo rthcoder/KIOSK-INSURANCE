@@ -8,8 +8,8 @@ export enum DepositStatus {
 export enum DepositStatusOutPut {
   STATUS_CREATE = 'СОЗДАННЫЙ',
   STATUS_WAIT = 'В ПУТИ',
-  STATUS_ERROR = 'ПЕРЕДАНО',
-  STATUS_SUCCESS = 'ОШИБКА',
+  STATUS_ERROR = 'ОШИБКА',
+  STATUS_SUCCESS = 'ПЕРЕДАНО',
 }
 
 export enum DepositSource {

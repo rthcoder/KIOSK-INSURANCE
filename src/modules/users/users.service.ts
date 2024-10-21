@@ -10,6 +10,8 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: any) {
+    console.log(process.env.FIREBASE_SENDER_TOKEN.replace(/\\n/g, '\n'))
+
     const { limit, sort, filters } = query
 
     const parsedLimit = parseInt(limit, 10)
@@ -160,8 +162,6 @@ export class UsersService {
       },
     })
 
-    console.log(userExists)
-
     if (!userExists) {
       throw new NotFoundException('User not found with given ID!')
     }
@@ -285,8 +285,6 @@ export class UsersService {
         },
       },
     })
-
-    console.log(user, 1)
 
     if (!user) {
       throw new NotFoundException('User does not exist')

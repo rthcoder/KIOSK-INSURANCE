@@ -1,10 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common'
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  Query,
+  UseInterceptors,
+  BadRequestException,
+  UploadedFile,
+} from '@nestjs/common'
 import { DepositService } from './deposit.service'
 import { CreateDepositDTO } from './dto'
 import { ApiTags } from '@nestjs/swagger'
 import { CheckTokenGuard } from 'guards'
 import { CustomRequest } from 'custom'
 import { QueryParams } from '@interfaces'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { v4 as uuidv4 } from 'uuid'
 
 @ApiTags('Deposits Service')
 @Controller({
@@ -35,9 +52,43 @@ export class DepositController {
     return this.depositService.create(createDepositDto, request?.user?.id)
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDepositDto: any) {
-    return this.depositService.update(+id, updateDepositDto)
+  @Post('notify')
+  sendNotification(@Body() dto: any) {
+    return this.depositService.sendNotification(dto)
+  }
+
+  @UseGuards(CheckTokenGuard)
+  @Post(':id')
+  @UseInterceptors(
+    FileInterceptor('chekPhoto', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uuid = uuidv4()
+          const filename = `${uuid}-${file.originalname.replace(/\s+/g, '')}`
+          cb(null, filename)
+        },
+      }),
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|pdf)$/)) {
+          return cb(new BadRequestException('Invalid file type'), false)
+        }
+        cb(null, true)
+      },
+    }),
+  )
+  update(
+    @Param('id') id: string,
+    @Req() request: CustomRequest,
+    @Body() updateDepositDto: any,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.depositService.update(+id, request?.user?.id, updateDepositDto, file)
+  }
+
+  @Patch('status-update/:id')
+  updateAccountant(@Param('id') id: number, @Body() dto: any) {
+    return this.depositService.updateDepositAccountant(+id, dto)
   }
 
   @Delete(':id')

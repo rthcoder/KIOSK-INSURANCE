@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Body, Injectable, NotFoundException } from '@nestjs/common'
 import { CreateDepositRequest, FindAllRegionResponse, QueryParams } from '@interfaces'
 import { PrismaService } from 'prisma/prisma.service'
 import { CustomRequest } from 'custom'
 import { DepositStatus, DepositStatusOutPut } from 'enums/deposit.enum'
 import { FilterService } from '@helpers'
 import { FindAllDepositResponse } from 'interfaces/deposit.interface'
-
+import * as admin from 'firebase-admin'
 @Injectable()
 export class DepositService {
   constructor(private readonly prisma: PrismaService) {}
@@ -14,9 +14,7 @@ export class DepositService {
     const { limit, sort, filters } = query
 
     const parsedLimit = parseInt(limit, 10)
-
     const parsedSort = sort ? JSON?.parse(sort) : {}
-
     const parsedFilters = filters ? JSON?.parse(filters) : []
 
     const deposits = await FilterService?.applyFilters('deposit', parsedFilters, parsedSort)
@@ -24,10 +22,30 @@ export class DepositService {
     const result = []
 
     for (const deposit of deposits) {
+      // DepositStatus ga qarab DepositStatusOutPut qiymatini aniqlash
+      let statusOutPut = ''
+
+      switch (deposit.status) {
+        case DepositStatus.STATUS_CREATE:
+          statusOutPut = DepositStatusOutPut.STATUS_CREATE
+          break
+        case DepositStatus.STATUS_WAIT:
+          statusOutPut = DepositStatusOutPut.STATUS_WAIT
+          break
+        case DepositStatus.STATUS_SUCCESS:
+          statusOutPut = DepositStatusOutPut.STATUS_SUCCESS
+          break
+        case DepositStatus.STATUS_ERROR:
+          statusOutPut = DepositStatusOutPut.STATUS_ERROR
+          break
+        default:
+          statusOutPut = 'UNKNOWN' // noma'lum status uchun
+      }
+
       result.push({
         id: deposit.id,
-        amount: deposit.amount,
-        status: deposit.status,
+        amount: Number(deposit.amount),
+        status: statusOutPut,
         comment: deposit.comment,
         checkPhoto: deposit.checkPhoto,
         type: deposit.type,
@@ -91,21 +109,43 @@ export class DepositService {
       },
     })
 
-    const result = depositStatic.map((deposit) => ({
-      id: deposit?.id,
-      amount: deposit?.amount,
-      status: deposit?.status,
-      comment: deposit?.comment,
-      checkPhoto: deposit?.checkPhoto,
-      type: deposit?.type,
-      source: deposit?.source,
-      cashCount: deposit?.cashCount,
-      operatorId: deposit?.operatorId,
-      incasatorId: deposit?.incasatorId,
-      confirmedId: deposit?.confirmedId,
-      bankId: deposit?.bankId,
-      createdAt: deposit?.createdAt,
-    }))
+    const result = depositStatic.map((deposit) => {
+      // DepositStatus ga qarab DepositStatusOutPut qiymatini aniqlash
+      let statusOutPut = ''
+
+      switch (deposit.status) {
+        case DepositStatus.STATUS_CREATE:
+          statusOutPut = DepositStatusOutPut.STATUS_CREATE
+          break
+        case DepositStatus.STATUS_WAIT:
+          statusOutPut = DepositStatusOutPut.STATUS_WAIT
+          break
+        case DepositStatus.STATUS_SUCCESS:
+          statusOutPut = DepositStatusOutPut.STATUS_SUCCESS
+          break
+        case DepositStatus.STATUS_ERROR:
+          statusOutPut = DepositStatusOutPut.STATUS_ERROR
+          break
+        default:
+          statusOutPut = 'UNKNOWN' // noma'lum status uchun
+      }
+
+      return {
+        id: deposit?.id,
+        amount: Number(deposit?.amount),
+        status: statusOutPut, // statusni string ko'rinishida qaytarish
+        comment: deposit?.comment,
+        checkPhoto: deposit?.checkPhoto,
+        type: deposit?.type,
+        source: deposit?.source,
+        cashCount: deposit?.cashCount,
+        operatorId: deposit?.operatorId,
+        incasatorId: deposit?.incasatorId,
+        confirmedId: deposit?.confirmedId,
+        bankId: deposit?.bankId,
+        createdAt: deposit?.createdAt,
+      }
+    })
 
     return {
       data: result,
@@ -126,6 +166,8 @@ export class DepositService {
       if (!opearatorExists) {
         throw new NotFoundException('Operator not found!')
       }
+
+      const cashCount = opearatorExists?.cashCount
 
       await prisma.user.update({
         where: {
@@ -171,7 +213,7 @@ export class DepositService {
         },
       })
 
-      await prisma.userBalance.update({
+      const incasatorBalanceUpdated = await prisma.userBalance.update({
         where: {
           userId: incasatorId,
           deletedAt: {
@@ -188,8 +230,8 @@ export class DepositService {
         data: {
           operatorId: data?.operatorId,
           incasatorId: incasatorId,
-          amount: totalAmountInOperator?.balance,
-          cashCount: opearatorExists?.cashCount,
+          amount: incasatorBalanceUpdated?.balance,
+          cashCount: cashCount,
           status: DepositStatus.STATUS_CREATE,
         },
       })
@@ -202,11 +244,119 @@ export class DepositService {
     })
   }
 
-  async update(id: number, data: any) {
-    return `This action updates a #${id} deposit`
+  async update(id: number, userId: number, data: any, file: Express.Multer.File) {
+    const deposit = await this.prisma.deposit.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!deposit) {
+      throw new NotFoundException('Deposit not found with given ID!')
+    }
+
+    const updatedDeposit = await this.prisma.deposit.update({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+      data: {
+        checkPhoto: file?.filename,
+        bankId: +data?.bankId,
+        comment: data?.comment,
+        updatedAt: new Date(),
+        status: DepositStatus.STATUS_WAIT,
+      },
+    })
+
+    await this.prisma.userBalance.update({
+      where: {
+        userId: userId,
+        deletedAt: {
+          equals: null,
+        },
+      },
+      data: {
+        balance: 0,
+        updatedAt: new Date(),
+      },
+    })
+  }
+
+  async updateDepositAccountant(id: number, data: any) {
+    const deposit = await this.prisma.deposit.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    if (!deposit) {
+      throw new NotFoundException('Deposit not found with given ID!')
+    }
+
+    await this.prisma.deposit.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status: data?.status,
+        updatedAt: new Date(),
+      },
+    })
+
+    return {
+      status: 201,
+      message: 'succes',
+    }
+  }
+
+  async sendNotification(data: any) {
+    const response = await admin
+      .messaging()
+      .send({
+        token: data?.token,
+        webpush: {
+          notification: {
+            title: data?.title,
+            body: data?.body,
+          },
+        },
+      })
+      .catch((err) => {
+        throw new BadRequestException('Someting went wrong')
+      })
+
+    return response
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} deposit`
+    const depositExists = await this.prisma.deposit.findUnique({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    await this.prisma.deposit.update({
+      where: {
+        id: id,
+        deletedAt: {
+          equals: null,
+        },
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    })
   }
 }
