@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common'
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Query } from '@nestjs/common'
 import { DepositService } from './deposit.service'
 import { CreateDepositDTO } from './dto'
 import { ApiTags } from '@nestjs/swagger'
 import { CheckTokenGuard } from 'guards'
 import { CustomRequest } from 'custom'
+import { QueryParams } from '@interfaces'
 
 @ApiTags('Deposits Service')
 @Controller({
@@ -14,8 +15,13 @@ export class DepositController {
   constructor(private readonly depositService: DepositService) {}
 
   @Get()
-  findAll() {
-    return this.depositService.findAll()
+  findAll(@Query() query: QueryParams) {
+    return this.depositService.findAll(query)
+  }
+
+  @Get('incasator-static')
+  findIncasatorDeposit(@Req() request: CustomRequest) {
+    return this.depositService.findIncasatorStatic(request?.user?.id)
   }
 
   @Get(':id')

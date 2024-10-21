@@ -6,6 +6,7 @@ import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express
 import { App } from './app'
 import { appConfig } from 'config/app.config'
 import { swaggerConfig } from '@config'
+import { BigIntInterceptor } from '@interceptors'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(App, new ExpressAdapter(), {
@@ -29,6 +30,7 @@ async function bootstrap() {
 
   // const logger = app.get(WinstonLoggerService)
   // app.useGlobalInterceptors(new LoggingInterceptor(logger))
+  app.useGlobalInterceptors(new BigIntInterceptor())
 
   app.useGlobalPipes(new ValidationPipe()),
     app.enableVersioning({

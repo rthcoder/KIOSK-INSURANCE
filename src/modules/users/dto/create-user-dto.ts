@@ -20,8 +20,8 @@ export class CreateUserDTO implements CreateUserRequest {
   @IsNumber()
   structureId: number
 
-  @IsNotEmpty()
-  @IsNumber()
+  // @IsNotEmpty()
+  // @IsNumber()
   incasatorId: number
 
   @IsOptional()

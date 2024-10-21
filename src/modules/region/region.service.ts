@@ -1,5 +1,11 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
-import { CreateRegionRequest, FindAllRegionResponse, FindOneRegionResponse, UpdateRegionRequest } from '@interfaces'
+import {
+  CreateRegionRequest,
+  FindAllRegionResponse,
+  FindOneRegionResponse,
+  QueryParams,
+  UpdateRegionRequest,
+} from '@interfaces'
 import { PrismaService } from 'prisma/prisma.service'
 import { FilterService } from '@helpers'
 @Injectable()

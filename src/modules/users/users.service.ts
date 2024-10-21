@@ -279,12 +279,14 @@ export class UsersService {
   async validate(data: any) {
     const user = await this.prisma.user.findFirst({
       where: {
-        login: data.email,
+        login: data.login,
         deletedAt: {
           equals: null,
         },
       },
     })
+
+    console.log(user, 1)
 
     if (!user) {
       throw new NotFoundException('User does not exist')

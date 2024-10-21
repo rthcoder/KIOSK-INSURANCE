@@ -75,6 +75,7 @@ model UserBalance {
 
   user User? @relation(fields: [userId], references: [id])
 
+  @@unique([userId])
   @@index([balance, userId, createdAt])
   @@map("user_balances")
 }
@@ -191,6 +192,6 @@ model UserBalanceHistory {
 
   user User @relation(fields: [userId], references: [id])
 
-  @@unique([id, userId])
+  @@unique([userId])
   @@map("user_balance_history")
 }

@@ -1,64 +1,205 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { CreateDepositRequest } from '@interfaces'
+import { CreateDepositRequest, FindAllRegionResponse, QueryParams } from '@interfaces'
 import { PrismaService } from 'prisma/prisma.service'
 import { CustomRequest } from 'custom'
+import { DepositStatus, DepositStatusOutPut } from 'enums/deposit.enum'
+import { FilterService } from '@helpers'
+import { FindAllDepositResponse } from 'interfaces/deposit.interface'
 
 @Injectable()
 export class DepositService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll() {
-    return `This action returns all deposit`
+  async findAll(query: any): Promise<FindAllDepositResponse> {
+    const { limit, sort, filters } = query
+
+    const parsedLimit = parseInt(limit, 10)
+
+    const parsedSort = sort ? JSON?.parse(sort) : {}
+
+    const parsedFilters = filters ? JSON?.parse(filters) : []
+
+    const deposits = await FilterService?.applyFilters('deposit', parsedFilters, parsedSort)
+
+    const result = []
+
+    for (const deposit of deposits) {
+      result.push({
+        id: deposit.id,
+        amount: deposit.amount,
+        status: deposit.status,
+        comment: deposit.comment,
+        checkPhoto: deposit.checkPhoto,
+        type: deposit.type,
+        source: deposit.source,
+        cashCount: deposit.cashCount,
+        operatorId: deposit.operatorId,
+        incasatorId: deposit.incasatorId,
+        confirmedId: deposit.confirmedId,
+        bankId: deposit.bankId,
+        createdAt: deposit.createdAt,
+      })
+    }
+
+    return {
+      data: result,
+    }
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} deposit`
-  }
-
-  async create(data: CreateDepositRequest, incasatorId: number) {
-    const opearatorExists = await this.prisma.user.findUnique({
+    const deposit = await this.prisma.deposit.findUnique({
       where: {
-        id: data?.operatorId,
+        id: id,
         deletedAt: {
           equals: null,
         },
       },
     })
 
-    if (!opearatorExists) {
-      throw new NotFoundException('Operator not found!')
+    if (!deposit) {
+      throw new NotFoundException('Deposit not found with given ID!')
     }
 
-    const newDoposit = await this.prisma.deposit.create({
-      data: {
-        operatorId: data?.operatorId,
-        incasatorId: incasatorId,
-      },
-    })
+    const result = {
+      id: deposit.id,
+      amount: deposit.amount,
+      status: deposit.status,
+      comment: deposit.comment,
+      checkPhoto: deposit.checkPhoto,
+      type: deposit.type,
+      source: deposit.source,
+      cashCount: deposit.cashCount,
+      operatorId: deposit.operatorId,
+      incasatorId: deposit.incasatorId,
+      confirmedId: deposit.confirmedId,
+      bankId: deposit.bankId,
+      createdAt: deposit.createdAt,
+    }
 
-    // if (newDoposit) {
-    //   return
-    // }
+    return {
+      data: result,
+    }
+  }
 
-    await this.prisma.user.update({
+  async findIncasatorStatic(userId: number): Promise<FindAllDepositResponse> {
+    const depositStatic = await this.prisma.deposit.findMany({
       where: {
-        id: data?.operatorId,
-      },
-      data: {
-        cashCount: 0,
-      },
-    })
-
-    await this.prisma.userBalance.updateMany({
-      where: {
-        userId: data?.operatorId,
-      },
-      data: {
-        balance: 0,
+        incasatorId: userId,
+        deletedAt: {
+          equals: null,
+        },
       },
     })
 
-    return 1
+    const result = depositStatic.map((deposit) => ({
+      id: deposit?.id,
+      amount: deposit?.amount,
+      status: deposit?.status,
+      comment: deposit?.comment,
+      checkPhoto: deposit?.checkPhoto,
+      type: deposit?.type,
+      source: deposit?.source,
+      cashCount: deposit?.cashCount,
+      operatorId: deposit?.operatorId,
+      incasatorId: deposit?.incasatorId,
+      confirmedId: deposit?.confirmedId,
+      bankId: deposit?.bankId,
+      createdAt: deposit?.createdAt,
+    }))
+
+    return {
+      data: result,
+    }
+  }
+
+  async create(data: CreateDepositRequest, incasatorId: number) {
+    return this.prisma.$transaction(async (prisma) => {
+      const opearatorExists = await prisma.user.findUnique({
+        where: {
+          id: data?.operatorId,
+          deletedAt: {
+            equals: null,
+          },
+        },
+      })
+
+      if (!opearatorExists) {
+        throw new NotFoundException('Operator not found!')
+      }
+
+      await prisma.user.update({
+        where: {
+          id: data?.operatorId,
+          deletedAt: {
+            equals: null,
+          },
+        },
+        data: {
+          cashCount: 0,
+          updatedAt: new Date(),
+        },
+      })
+
+      const totalAmountInOperator = await prisma.userBalance.findUnique({
+        where: {
+          userId: data?.operatorId,
+          deletedAt: {
+            equals: null,
+          },
+        },
+      })
+
+      const incasatorBalance = await prisma.userBalance.findUnique({
+        where: {
+          userId: incasatorId,
+          deletedAt: {
+            equals: null,
+          },
+        },
+      })
+
+      await prisma.userBalance.update({
+        where: {
+          userId: data?.operatorId,
+          deletedAt: {
+            equals: null,
+          },
+        },
+        data: {
+          balance: 0,
+          updatedAt: new Date(),
+        },
+      })
+
+      await prisma.userBalance.update({
+        where: {
+          userId: incasatorId,
+          deletedAt: {
+            equals: null,
+          },
+        },
+        data: {
+          balance: totalAmountInOperator?.balance + incasatorBalance?.balance,
+          updatedAt: new Date(),
+        },
+      })
+
+      const newDeposit = await prisma.deposit.create({
+        data: {
+          operatorId: data?.operatorId,
+          incasatorId: incasatorId,
+          amount: totalAmountInOperator?.balance,
+          cashCount: opearatorExists?.cashCount,
+          status: DepositStatus.STATUS_CREATE,
+        },
+      })
+
+      return {
+        status: 201,
+        message: 'Deposit succesfully created',
+        depositStatus: DepositStatusOutPut.STATUS_CREATE,
+      }
+    })
   }
 
   async update(id: number, data: any) {
