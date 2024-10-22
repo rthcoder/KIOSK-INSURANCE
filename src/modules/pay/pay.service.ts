@@ -1,5 +1,5 @@
 import { TransactionStatus } from '@enums'
-import { Injectable } from '@nestjs/common'
+import { Injectable, NotFoundException } from '@nestjs/common'
 import { PayGate } from 'gateRequest'
 import { PrismaService } from 'prisma/prisma.service'
 
@@ -68,7 +68,31 @@ export class PayService {
     return result.getResponse()
   }
 
-  async saveEveryCash(data: any) {
-    await this.prisma.user.findMany()
+  async saveEveryCash(data: any, userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: userId,
+        deletedAt: {
+          equals: null,
+        },
+      },
+    })
+
+    const cashCountRightNow = user.cashCount
+
+    console.log(cashCountRightNow)
+
+    if (!user) {
+      throw new NotFoundException('User not found with given ID!')
+    }
+
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        cashCount: cashCountRightNow + 1,
+      },
+    })
   }
 }

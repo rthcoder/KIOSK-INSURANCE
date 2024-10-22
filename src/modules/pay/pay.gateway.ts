@@ -38,8 +38,8 @@ export class PayGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
   @UseGuards(CheckTokenGuard)
   @SubscribeMessage('pay')
   async handlePayment(@MessageBody() data: any, @Req() request: CustomRequest): Promise<any> {
-    this.payService.saveEveryCash(data)
-    console.log('salam')
-    this.server.emit('payResponse', { amount: 'salam' })
+    this.payService.saveEveryCash(data, request?.user?.id)
+    // console.log('salam')
+    // this.server.emit('payResponse', { amount: 'salam' })
   }
 }
