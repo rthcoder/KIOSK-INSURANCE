@@ -9,5 +9,6 @@ export enum MethodList {
   CREATE_INSURANCE = 'create',
   GET_POLIS_URL = 'get_polis_url',
   PAM_CHECK = 'pam.check',
-  PAM_CHECK_PAYMENT = 'pam.prepare_pay',
+  PAM_PREPARE_PAYMENT = 'pam.prepare_pay',
+  PAM_CONFIRM_PAYMENT = 'pam.confirm_pay',
 }

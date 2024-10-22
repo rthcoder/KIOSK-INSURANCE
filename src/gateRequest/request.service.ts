@@ -39,7 +39,7 @@ export class InfinityRequestService {
         }),
       )
 
-      // this.response = response.data
+      this.response = response.data
       // this.response = {
       //   "id": 207,
       //   "error": null,

@@ -5,10 +5,11 @@ import { PayGate, RequestModule } from 'gateRequest'
 import { HttpModule } from '@nestjs/axios'
 import { PrismaModule } from 'prisma/prisma.module'
 import { ConfigService } from '@nestjs/config'
+import { PayGateway } from './pay.gateway'
 
 @Module({
   imports: [RequestModule, HttpModule, PrismaModule],
   controllers: [PayController],
-  providers: [PayService, ConfigService, PayGate],
+  providers: [PayService, ConfigService, PayGate, PayGateway],
 })
 export class PayModule {}

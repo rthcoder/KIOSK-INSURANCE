@@ -14,13 +14,11 @@ export class UsersService {
 
     const { limit, sort, filters } = query
 
-    const parsedLimit = parseInt(limit, 10)
-
     const parsedSort = sort ? JSON?.parse(sort) : {}
 
     const parsedFilters = filters ? JSON?.parse(filters) : []
 
-    const regions = await FilterService?.applyFilters('user', parsedFilters, parsedSort)
+    // const users = await FilterService?.applyFilters('user', parsedFilters, parsedSort)
 
     const users = await this.prisma.user.findMany({
       where: {

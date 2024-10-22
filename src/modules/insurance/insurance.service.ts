@@ -37,6 +37,8 @@ export class InsuranceService {
   }
 
   async createInsurance(data: any, userId: any) {
+    console.log(userId)
+
     const result = await this.insuranceGateService.createInsurance(
       data,
       process.env.QUICKPAY_SERVICE_ID,

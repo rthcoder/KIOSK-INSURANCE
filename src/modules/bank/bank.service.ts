@@ -10,6 +10,8 @@ export class BankService {
   async findAll(query: any) {
     const { limit, sort, filters } = query
 
+    Number(limit)
+
     const parsedSort = sort ? JSON?.parse(sort) : {}
 
     const parsedFilters = filters ? JSON?.parse(filters) : []

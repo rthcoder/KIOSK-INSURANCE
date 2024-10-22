@@ -1,7 +1,6 @@
-import { BadRequestException, Body, Injectable, NotFoundException } from '@nestjs/common'
-import { CreateDepositRequest, FindAllRegionResponse, QueryParams } from '@interfaces'
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { CreateDepositRequest } from '@interfaces'
 import { PrismaService } from 'prisma/prisma.service'
-import { CustomRequest } from 'custom'
 import { DepositStatus, DepositStatusOutPut } from 'enums/deposit.enum'
 import { FilterService } from '@helpers'
 import { FindAllDepositResponse } from 'interfaces/deposit.interface'
@@ -13,7 +12,6 @@ export class DepositService {
   async findAll(query: any): Promise<FindAllDepositResponse> {
     const { limit, sort, filters } = query
 
-    const parsedLimit = parseInt(limit, 10)
     const parsedSort = sort ? JSON?.parse(sort) : {}
     const parsedFilters = filters ? JSON?.parse(filters) : []
 
@@ -226,7 +224,7 @@ export class DepositService {
         },
       })
 
-      const newDeposit = await prisma.deposit.create({
+      await prisma.deposit.create({
         data: {
           operatorId: data?.operatorId,
           incasatorId: incasatorId,
@@ -258,7 +256,7 @@ export class DepositService {
       throw new NotFoundException('Deposit not found with given ID!')
     }
 
-    const updatedDeposit = await this.prisma.deposit.update({
+    await this.prisma.deposit.update({
       where: {
         id: id,
         deletedAt: {
@@ -331,6 +329,7 @@ export class DepositService {
         },
       })
       .catch((err) => {
+        console.log(err)
         throw new BadRequestException('Someting went wrong')
       })
 
@@ -346,6 +345,10 @@ export class DepositService {
         },
       },
     })
+
+    if (!depositExists) {
+      throw new NotFoundException('Deposit not found with given ID!')
+    }
 
     await this.prisma.deposit.update({
       where: {

@@ -18,7 +18,23 @@ export class CheckTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<CustomRequest>()
 
-    const accessToken = request.headers.authorization?.replace(/^(bearer)\s/i, '')
+    const type = context.getType()
+
+    let accessToken: string | undefined
+
+    if (type === 'http') {
+      const request = context.switchToHttp().getRequest<CustomRequest>()
+      accessToken = request.headers.authorization?.replace(/^(bearer)\s/i, '')
+    } else if (type === 'ws') {
+      const client = context.switchToWs().getClient()
+      console.log(client.handshake.headers.authorization)
+
+      accessToken = client.handshake.headers.authorization
+    }
+
+    // const accessToken = request.headers.authorization?.replace(/^(bearer)\s/i, '')
+
+    console.log(accessToken)
 
     if (!accessToken || !isJWT(accessToken)) {
       throw new UnauthorizedException(ErrorCodes.ACCESS_TOKEN_NOT_VALID)

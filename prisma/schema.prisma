@@ -147,7 +147,7 @@ model Transaction {
   userId               Int?      @map("user_id")
   insuranceId          Int?      @map("insurance_id")
   vendorId             Int?      @map("vendor_id")
-  anketaId             Int?      @map("anketa_id")
+  anketaId             String?   @map("anketa_id")
   account              String?
   amount               BigInt?   @default(0)
   structureId          Int?      @map("structure_id")
@@ -155,10 +155,10 @@ model Transaction {
   request              Json?
   response             Json?
   payerPhone           String?
-  merchantId           String?
-  terminalId           String?
+  merchantId           Int?
+  terminalId           Int?
   partnerTransactionId String?   @map("partner_transaction_id")
-  bankTransactionId    String?   @map("bank_transaction_id")
+  bankTransactionId    Int?      @map("bank_transaction_id")
   status               Int?      @default(0)
   smsNotify            Int?      @default(0)
   paymentType          Int?      @default(0)

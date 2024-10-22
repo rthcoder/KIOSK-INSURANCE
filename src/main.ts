@@ -6,7 +6,8 @@ import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express
 import { App } from './app'
 import { appConfig } from 'config/app.config'
 import { swaggerConfig } from '@config'
-import { BigIntInterceptor } from '@interceptors'
+import { createServer } from 'http'
+import { IoAdapter } from '@nestjs/platform-socket.io'
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(App, new ExpressAdapter(), {
@@ -28,29 +29,34 @@ async function bootstrap() {
     }),
   )
 
-  // const logger = app.get(WinstonLoggerService)
-  // app.useGlobalInterceptors(new LoggingInterceptor(logger))
-  // app.useGlobalInterceptors(new BigIntInterceptor())
+  //initialize socket
 
-  app.useGlobalPipes(new ValidationPipe()),
-    app.enableVersioning({
-      type: VersioningType.URI,
-      prefix: 'api/v',
-    })
+  // Global validation pipes
+  app.useGlobalPipes(new ValidationPipe())
 
+  // API versioning
+  app.enableVersioning({
+    type: VersioningType.URI,
+    prefix: 'api/v',
+  })
+
+  // Application settings
   app.set('env', appConfig.env)
   app.set('etag', 'strong')
   app.set('trust proxy', true)
   app.set('x-powered-by', false)
 
+  // Swagger setup
   const document = SwaggerModule.createDocument(app, swaggerConfig.options)
-
   SwaggerModule.setup(swaggerConfig.path, app, document, {
     swaggerOptions: {
       defaultModelsExpandDepth: -1,
     },
   })
 
+  app.useWebSocketAdapter(new IoAdapter(app))
+
+  // Start server
   await app.listen(appConfig.port, appConfig.host)
 }
 bootstrap()
