@@ -27,8 +27,23 @@ export class PayController {
     return this.payService.confirmPayment(dto)
   }
 
-  @Post('save-every-cash')
-  saveEveryCash(@Body() dto: any) {
-    return this.payService.confirmPayment(dto)
+  @Post('resend-sms')
+  resendSms(@Body() dto: any) {
+    return this.payService.resendSms(dto)
   }
+
+  @Post('check-status-transaction')
+  checkTransactionStatus(@Body() dto: any) {
+    return this.payService.checkTransactionStatus(dto)
+  }
+
+  @Post('get-receipt')
+  checkReceipt(@Body() dto: any) {
+    return this.payService.checkTransactionStatus(dto)
+  }
+
+  // @Post('save-every-cash')
+  // saveEveryCash(@Body() dto: any) {
+  //   return this.payService.confirmPayment(dto)
+  // }
 }

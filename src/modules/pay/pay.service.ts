@@ -1,4 +1,5 @@
 import { TransactionStatus } from '@enums'
+import { FirebaseService } from '@helpers'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { PayGate } from 'gateRequest'
 import { PrismaService } from 'prisma/prisma.service'
@@ -8,6 +9,7 @@ export class PayService {
   constructor(
     private readonly payGateService: PayGate,
     private readonly prisma: PrismaService,
+    private readonly firabase: FirebaseService,
   ) {}
 
   async preparePay(data: any, userId: number): Promise<void> {
@@ -58,6 +60,33 @@ export class PayService {
     return result.getResponse()
   }
 
+  async resendSms(data: any) {
+    const result = await this.payGateService.payByCard(
+      process.env.QUICKPAY_SERVICE_ID,
+      process.env.QUICKPAY_SERVICE_KEY,
+      data,
+    )
+    return result.getResponse()
+  }
+
+  async checkTransactionStatus(data: any) {
+    const result = await this.payGateService.payByCard(
+      process.env.QUICKPAY_SERVICE_ID,
+      process.env.QUICKPAY_SERVICE_KEY,
+      data,
+    )
+    return result.getResponse()
+  }
+
+  async checkReceipt(data: any) {
+    const result = await this.payGateService.payByCard(
+      process.env.QUICKPAY_SERVICE_ID,
+      process.env.QUICKPAY_SERVICE_KEY,
+      data,
+    )
+    return result.getResponse()
+  }
+
   async confirmPayment(data: any) {
     const result = await this.payGateService.confirmPayment(
       process.env.QUICKPAY_SERVICE_ID,
@@ -86,12 +115,33 @@ export class PayService {
       throw new NotFoundException('User not found with given ID!')
     }
 
+    if (cashCountRightNow === 1900 && cashCountRightNow < 1900) {
+      const firebaseToken =
+        'e4v5FgpTQqOKu7bZnFQbqC:APA91bFRz1Mkpz2708VJFLaYgp8xtZjHMM8bF-GbWHMRK9Y6EjVgjtP86LJLoCkPzkkmk1VAGVxmtlVCF0cnLdIHxDv7iLzsZ36bEDmPccKs2kooxf36nTcIVDcHrB_4Ir286vksadSw'
+      if (firebaseToken) {
+        await this.firabase.sendPushNotification(firebaseToken, 'Ketdi', 'Naqd pul 1900 dan oshdi')
+      }
+    }
+
     await this.prisma.user.update({
       where: {
         id: userId,
       },
       data: {
         cashCount: cashCountRightNow + 1,
+      },
+    })
+
+    const insurance = await this.prisma.insurance.update({
+      where: {
+        id: userId,
+        deletedAt: {
+          equals: null,
+        },
+        status: 'created',
+      },
+      data: {
+        amount: data?.amount,
       },
     })
   }

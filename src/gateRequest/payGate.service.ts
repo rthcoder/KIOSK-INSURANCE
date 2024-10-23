@@ -30,4 +30,31 @@ export class PayGate extends InfinityRequestService {
       .setParams({ confirmation_form: data })
       .send()
   }
+
+  async resendSms(serviceId: string, serviceKey: string, data: any) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.PAM_CONFIRM_PAYMENT)
+      .setUrl(process.env.PAYMENT_URL)
+      .setParams({ confirmation_form: data })
+      .send()
+  }
+
+  async checkTransactionStatus(serviceId: string, serviceKey: string, data: any) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.PAM_CONFIRM_PAYMENT)
+      .setUrl(process.env.PAYMENT_URL)
+      .setParams({ confirmation_form: data })
+      .send()
+  }
+
+  async getReceipt(serviceId: string, serviceKey: string, data: any) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.PAM_CONFIRM_PAYMENT)
+      .setUrl(process.env.PAYMENT_URL)
+      .setParams({ confirmation_form: data })
+      .send()
+  }
 }

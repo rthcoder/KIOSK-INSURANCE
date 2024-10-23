@@ -44,13 +44,13 @@ import * as admin from 'firebase-admin'
   providers: [],
 })
 export class App {
-  // constructor() {
-  //   admin.initializeApp({
-  //     credential: admin.credential.cert({
-  //       projectId: process.env.FIREBASE_SENDER_ID,
-  //       privateKey: process.env.FIREBASE_SENDER_TOKEN.replace(/\\n/g, '\n'),
-  //       clientEmail: 'niamdirda@gmail.com'
-  //     }),
-  //   })
-  // }
+  constructor() {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_SENDER_ID,
+        privateKey: process.env.FIREBASE_SENDER_TOKEN.replace(/\\n/g, '\n'),
+        clientEmail: process.env.FIREBASE_SENDER_EMAIL,
+      }),
+    })
+  }
 }
