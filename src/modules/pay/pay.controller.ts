@@ -1,34 +1,49 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common'
+import { Controller, Post, Body, Req, UseGuards } from '@nestjs/common'
 import { PayService } from './pay.service'
-import { CreatePayDto } from './dto/create-pay.dto'
-import { UpdatePayDto } from './dto/update-pay.dto'
+import { ApiTags } from '@nestjs/swagger'
+import { CustomRequest } from 'custom'
+import { CheckTokenGuard } from 'guards'
 
-@Controller('pay')
+@ApiTags('Pay Service')
+@Controller({
+  version: '1',
+})
 export class PayController {
   constructor(private readonly payService: PayService) {}
 
-  @Post()
-  create(@Body() createPayDto: CreatePayDto) {
-    return this.payService.create(createPayDto)
+  @UseGuards(CheckTokenGuard)
+  @Post('check-pay-card')
+  payByCard(@Body() createPayDto: any, @Req() request: CustomRequest) {
+    return this.payService.preparePay(createPayDto, request?.user?.id)
   }
 
-  @Get()
-  findAll() {
-    return this.payService.findAll()
+  @Post('prepare-pay-card')
+  preparePay(@Body() preparePayDto: any) {
+    return this.payService.payByCard(preparePayDto)
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.payService.findOne(+id)
+  @Post('confirm-pay-card')
+  confirmPayment(@Body() dto: any) {
+    return this.payService.confirmPayment(dto)
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePayDto: UpdatePayDto) {
-    return this.payService.update(+id, updatePayDto)
+  @Post('resend-sms')
+  resendSms(@Body() dto: any) {
+    return this.payService.resendSms(dto)
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.payService.remove(+id)
+  @Post('check-status-transaction')
+  checkTransactionStatus(@Body() dto: any) {
+    return this.payService.checkTransactionStatus(dto)
   }
+
+  @Post('get-receipt')
+  checkReceipt(@Body() dto: any) {
+    return this.payService.checkTransactionStatus(dto)
+  }
+
+  // @Post('save-every-cash')
+  // saveEveryCash(@Body() dto: any) {
+  //   return this.payService.confirmPayment(dto)
+  // }
 }

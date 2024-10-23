@@ -3,7 +3,8 @@ import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
 import * as crypto from 'crypto'
-import { createAuthHeader } from '@helpers'
+import { REQUEST_ERRORS } from '@enums'
+import { GetInsuranceIds } from '@interfaces'
 
 @Injectable()
 export class InfinityRequestService {
@@ -13,6 +14,7 @@ export class InfinityRequestService {
   private errorUnknown: any
   private serviceKey: string
   private serviceId: string
+  private url: string
 
   constructor(
     private readonly httpService: HttpService,
@@ -23,7 +25,7 @@ export class InfinityRequestService {
   async send() {
     const jsonPayload = this.getRequest()
 
-    const url = this.configService.get<string>('psp.url')
+    const url = this.getUrl()
     const authHeader = this.generateForAuth()
 
     try {
@@ -38,20 +40,79 @@ export class InfinityRequestService {
       )
 
       this.response = response.data
+      // this.response = {
+      //   "id": 207,
+      //   "error": null,
+      //   "result": {
+      //     "masked_phone_number": "+99890*****50",
+      //     "time_out": 120,
+      //     "confirm_form": [
+      //       {
+      //         "label": "Код подтверждения",
+      //         "key": "confirmation_code",
+      //         "element": "input",
+      //         "type": "int",
+      //         "value": "",
+      //         "mask": "######",
+      //         "regex": "^[0-9]{6}$",
+      //         "placeholder": "",
+      //         "size": 6,
+      //         "order": 10,
+      //         "is_required": 1
+      //       },
+      //       {
+      //         "key": "bank_transaction_id",
+      //         "value": 6236,
+      //         "show": 0,
+      //         "is_required": 1
+      //       }
+      //     ],
+      //     "request_method": "pam.confirm_pay"
+      //   }
+      // }
+
+      // this.response = {
+      //   "method": "pam.confirm_pay",
+      //   "params": {
+      //     "confirm_form": {
+      //       "confirmation_code": "000000",
+      //       "bank_transaction_id": 127
+      //     }
+      //   },
+      //   "id": 207
+      // }
+
+      // this.response = {
+      //   "id": 207,
+      //   "error": null,
+      //   "result": {
+      //     "details": {
+      //       "id": "8g78g88d7gdq5ytq89utyq45",
+      //       "masked_card_number": "860053******9500",
+      //       "transaction_id": 4534534,
+      //       "bank_transaction_id": 6845346,
+      //       "reference_number": 5464563454,
+      //       "amount": 1000,
+      //       "merchantId": 33005329,
+      //       "terminalId": 33004331,
+      //       "date": 12425135346
+      //     }
+      //   }
+      // }
 
       if (!this.response) {
         this.setErrorUnknown({
-          code: 'Ответ недействителен',
-          message: 'UNKNOWN_RESPONSE_ERROR',
+          code: REQUEST_ERRORS.INVALID_ANSWER,
+          message: REQUEST_ERRORS.UNKNOWN_RESPONSE_ERROR,
         })
       }
 
       return this
     } catch (error: any) {
       if (error.response) {
-        throw new HttpException(`CURL request failed: ${error.message}`, error.response.status)
+        throw new HttpException(`AXIOS request failed: ${error.message}`, error.response.status)
       } else {
-        throw new InternalServerErrorException('CURL request failed: ' + error.message)
+        throw new InternalServerErrorException('AXIOS request failed: ' + error.message)
       }
     }
   }
@@ -72,6 +133,11 @@ export class InfinityRequestService {
     return this
   }
 
+  setUrl(params: string): InfinityRequestService {
+    this.url = params
+    return this
+  }
+
   // Javobni saqlash
   setResponse(response: any): InfinityRequestService {
     this.response = response
@@ -85,6 +151,10 @@ export class InfinityRequestService {
 
   getParams(): any {
     return this.params || {}
+  }
+
+  getUrl(): any {
+    return this.url || ''
   }
 
   setMethod(method: string): InfinityRequestService {
@@ -104,9 +174,6 @@ export class InfinityRequestService {
   private generateForAuth(): string {
     const timestamp = Date.now()
 
-    console.log(this.serviceKey)
-    console.log(this.serviceId)
-
     const hash = crypto
       .createHash('sha1')
       .update(this.serviceKey + timestamp)
@@ -125,6 +192,16 @@ export class InfinityRequestService {
     return this.response?.result || []
   }
 
+  getInsuranceIds(): GetInsuranceIds {
+    const result = {
+      order_id: this?.response?.result?.order_id,
+      anketa_id: this?.response?.result?.anketa_id,
+      polis_id: this?.response?.result?.polis_id,
+      vendor_id: this?.response?.result?.pay?.params?.vendor_id,
+    }
+    return result
+  }
+
   getError(): any {
     return this.response?.error || this.errorUnknown
   }
@@ -137,15 +214,27 @@ export class InfinityRequestService {
     return !this.getError()
   }
 
-  // getResultSms(): any {
-  //   const confirmSms = this.getResult()?.confirm_form || [];
-  //   return confirmSms.find(item => item.key === 'transaction_id')?.value || null;
-  // }
+  getResultSms(): any {
+    const confirmSms = this.getResult()?.confirm_form || []
 
-  // getResultCheckPay(): any {
-  //   const result = this.getResult() || [];
-  //   return result.find(item => item.request_method === 'pam.prepare_pay') || null;
-  // }
+    if (!confirmSms || !Array.isArray(confirmSms)) {
+      throw new Error('confirm_form is not an array or is undefined.')
+    }
+
+    const foundItem = confirmSms.find((item) => item?.key === 'transaction_id')
+    return foundItem ? foundItem.value : null
+  }
+
+  getResultCheckPay(): any {
+    const result = this.getResult() || []
+
+    if (!result || !Array.isArray(result)) {
+      throw new Error('Result is not an array or is undefined.')
+    }
+
+    const foundItem = result.find((item) => item?.request_method === 'pam.prepare_pay')
+    return foundItem || null
+  }
 
   getDetails(): any {
     return this.response?.result?.details || []

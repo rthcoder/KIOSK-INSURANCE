@@ -5,22 +5,39 @@ import { GetServiceRequest } from '@interfaces'
 
 @Injectable()
 export class InsuranceGateService extends InfinityRequestService {
-  // findCompany metodi
   async findCompany(serviceId: string, serviceKey: string) {
-    return this.setServiceId(serviceId).setServiceKey(serviceKey).setMethod(MethodList.GET_COMPANY).setParams({}).send()
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.GET_COMPANY)
+      .setUrl(process.env.INSURANCE_URL)
+      .setParams({})
+      .send()
   }
 
-  // findService metodi
-  async findService(data: GetServiceRequest) {
-    this.setMethod(MethodList.GET_SERVICES)
-    this.setParams(data)
-    return this.send()
+  async findService(data: GetServiceRequest, serviceId: string, serviceKey: string) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.GET_SERVICES)
+      .setUrl(process.env.INSURANCE_URL)
+      .setParams(data)
+      .send()
   }
 
-  // getStep metodi
-  async getStep(data: any) {
-    this.setMethod(MethodList.GET_STEP)
-    this.setParams(data)
-    return this.send()
+  async getStep(data: any, serviceId: string, serviceKey: string) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.GET_STEP)
+      .setUrl(process.env.INSURANCE_URL)
+      .setParams(data)
+      .send()
+  }
+
+  async createInsurance(data: any, serviceId: string, serviceKey: string) {
+    return this.setServiceId(serviceId)
+      .setServiceKey(serviceKey)
+      .setMethod(MethodList.CREATE_INSURANCE)
+      .setUrl(process.env.INSURANCE_URL)
+      .setParams(data)
+      .send()
   }
 }
