@@ -28,8 +28,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm install pnpm
-        run: pnpm i
+        run: pnpm install
 
       - name: Notify Telegram on push success
         if: github.event_name == 'push' && success()
