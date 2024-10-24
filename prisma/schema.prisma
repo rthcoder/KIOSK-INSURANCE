@@ -71,7 +71,7 @@ model UserBalance {
   deletedAt DateTime? @map("deleted_at")
 
   userId Int @map("user_id")
-  lastId Int @map("last_id")
+  lastId Int @default(0) @map("last_id")
 
   user User? @relation(fields: [userId], references: [id])
 

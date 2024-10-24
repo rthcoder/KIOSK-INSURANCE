@@ -31,7 +31,7 @@ jobs:
           pnpm install
           pnpm build
 
-      # Step 5: Add SSH Key
+      # Step 5: Add SSH Key (base64 dekodlash orqali)
       - name: Add SSH Key
         run: |
           mkdir -p ~/.ssh
@@ -46,7 +46,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          key: ${{ secrets.SSH_KEY }}  # SSH_KEY_BASE64 ishlatilmoqda
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
