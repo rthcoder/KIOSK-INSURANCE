@@ -20,14 +20,12 @@ jobs:
         with:
           node-version: '20.17.0'
 
-      - name: Configure npm registry  # NPM registrini sozlash
-        run: |
-          npm config set registry https://registry.npmjs.org/
+      - name: Configure npm registry
+        run: npm config set registry https://registry.npmjs.org/
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
-        with:
-          version: 9.11.0  # Aniq pnpm versiyasini kiriting
+      - name: Install pnpm manually  # Qo'lda pnpm o'rnatish
+        run: |
+          npm install -g pnpm@9.11.0
 
       - name: Install dependencies
         run: |
