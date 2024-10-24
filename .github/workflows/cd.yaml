@@ -33,7 +33,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}  # OpenSSH formatda kalit kiritilgan bo'lishi kerak
+          key: ${{ secrets.SSH_KEY }}  # SSH_PRIVATE_KEY secret orqali olingan private key
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
