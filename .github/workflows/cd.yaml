@@ -19,6 +19,7 @@ jobs:
           node-version: "20.17.0" # Node versiyasi
 
       - name: Install dependencies
+        run: npm install pnpm
         run: pnpm install
 
       - name: Setup SSH
