@@ -21,9 +21,9 @@ jobs:
           node-version: '20.17.0'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4  # pnpm'ni o'rnatish uchun action
+        uses: pnpm/action-setup@v2.2.4
         with:
-          version: 9.11.0  # Bu yerda sizning pnpm versiyangiz ko'rsatilgan
+          version: 9.11.0  # Aniq pnpm versiyasini kiriting
 
       - name: Install dependencies
         run: |
