@@ -16,9 +16,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20.17.0" # Node versiyasi
+          node-version: "20.17.0"
 
-      - name: Install pnpm manually  # pnpm ni qo'lda o'rnatish
+      - name: Install pnpm manually
         run: |
           npm install -g pnpm@9.11.0
 
@@ -33,7 +33,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          key: ${{ secrets.SSH_KEY }}  # OpenSSH formatda kalit kiritilgan bo'lishi kerak
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
