@@ -24,9 +24,10 @@ jobs:
       - name: Install pnpm globally
         run: |
           npm install -g pnpm
+          export PATH="$PATH:$(npm bin -g)"  # `pnpm`ni global path'ga qo'shish
 
       - name: Install jq
-        run: sudo apt-get install jq
+        run: sudo apt-get install -y jq
 
       - name: Install dependencies
         run: |

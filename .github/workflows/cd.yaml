@@ -33,7 +33,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          key: ${{ secrets.SSH_KEY }} # Bu kalitni to'g'ri formatda base64 qilib kiriting.
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
@@ -62,4 +62,3 @@ jobs:
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="CD Failed.%0ACommit: $COMMIT_MESSAGE%0AAuthor: $COMMIT_AUTHOR"
-
