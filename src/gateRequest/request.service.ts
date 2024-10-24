@@ -1,4 +1,4 @@
-import { Injectable, HttpException, InternalServerErrorException } from '@nestjs/common'
+import { Injectable, HttpException, InternalServerErrorException, BadRequestException } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
 import { firstValueFrom } from 'rxjs'
@@ -40,6 +40,11 @@ export class InfinityRequestService {
       )
 
       this.response = response.data
+
+      if (this.getError()) {
+        throw new BadRequestException(this.getErrorMessage())
+      }
+
       // this.response = {
       //   "id": 207,
       //   "error": null,
@@ -203,7 +208,11 @@ export class InfinityRequestService {
   }
 
   getError(): any {
-    return this.response?.error || this.errorUnknown
+    return this.response?.error.message || this.errorUnknown
+  }
+
+  getErrorMessage(): string {
+    return this.response.error.message || this.errorUnknown
   }
 
   getErrorUnknown(): any {
