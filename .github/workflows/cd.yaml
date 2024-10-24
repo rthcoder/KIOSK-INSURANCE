@@ -14,13 +14,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "20.17.0" # Node versiyasi
 
-      - name: Install pnpm
-        run: |
-          npm install -g pnpm
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4  # pnpm'ni o'rnatish uchun action
 
       - name: Install dependencies
         run: |
@@ -33,7 +32,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }} # Bu kalitni to'g'ri formatda base64 qilib kiriting.
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
@@ -62,3 +61,4 @@ jobs:
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="CD Failed.%0ACommit: $COMMIT_MESSAGE%0AAuthor: $COMMIT_AUTHOR"
+
