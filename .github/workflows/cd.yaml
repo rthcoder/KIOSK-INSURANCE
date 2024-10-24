@@ -10,23 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Step 2: Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20.17.0"
+          node-version: "20.17.0" # Node.js versiyasi, GitHub Secrets emas
 
+      # Step 3: Install pnpm manually
       - name: Install pnpm manually
         run: |
           npm install -g pnpm@9.11.0
 
+      # Step 4: Install dependencies
       - name: Install dependencies
         run: |
           pnpm install
           pnpm build
 
+      # Step 5: Add SSH Key from GitHub Secrets
       - name: Add SSH Key
         run: |
           mkdir -p ~/.ssh
@@ -34,15 +39,16 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
 
+      # Step 6: Setup SSH and execute deployment commands
       - name: Setup SSH
         uses: appleboy/ssh-action@master
         id: ssh
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          script: |
+          host: ${{ secrets.HOST }}               # GitHub Secrets'dan HOST
+          username: ${{ secrets.USERNAME }}        # GitHub Secrets'dan USERNAME
+          key: ${{ secrets.SSH_KEY }}              # GitHub Secrets'dan SSH_KEY (private key)
+          port: 22                                 # SSH port (22)
+          script: |                                # Serverda bajariladigan buyruqlar
             cd ~/KIOSK-INSURANCE/
             git stash || { echo "git stash failed"; exit 1; }
             git pull origin main || { echo "git pull failed"; exit 1; }
@@ -52,6 +58,7 @@ jobs:
             pnpm build
             pm2 restart insurance
 
+      # Step 7: Notify Telegram on success
       - name: Notify Telegram on success
         if: success()
         run: |
@@ -61,6 +68,7 @@ jobs:
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="CD Successfully.\\nCommit: $COMMIT_MESSAGE\\nAuthor: $COMMIT_AUTHOR"
 
+      # Step 8: Notify Telegram on failure
       - name: Notify Telegram on failure
         if: failure()
         run: |
