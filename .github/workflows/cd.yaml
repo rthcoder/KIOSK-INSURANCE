@@ -19,7 +19,6 @@ jobs:
           node-version: "20.17.0" # Node versiyasi
 
       - name: Install dependencies
-        run: npm install pnpm
         run: pnpm install
 
       - name: Setup SSH
@@ -31,12 +30,13 @@ jobs:
           key: ${{ secrets.KEY }}
           port: 22
           script: |
-            cd ~/ecommApi/
+            cd ~/KIOSK-INSURANCE/
             git stash || { echo "git stash failed"; exit 1; }
             git pull origin main || { echo "git pull failed"; exit 1; }
             pnpm install
             npx prisma migrate dev --name migrated
-            pm2 restart 4
+            npx prisma generate
+            pm2 restart insurance
 
       - name: Notify Telegram on success
         if: success()
