@@ -27,13 +27,20 @@ jobs:
           pnpm install
           pnpm build
 
+      - name: Add SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo -e "Host *\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+
       - name: Setup SSH
         uses: appleboy/ssh-action@master
         id: ssh
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}  # SSH_PRIVATE_KEY secret orqali olingan private key
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
