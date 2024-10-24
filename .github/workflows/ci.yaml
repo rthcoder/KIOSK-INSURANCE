@@ -20,6 +20,10 @@ jobs:
         with:
           node-version: '20.17.0'
 
+      - name: Configure npm registry  # NPM registrini sozlash
+        run: |
+          npm config set registry https://registry.npmjs.org/
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v2.2.4
         with:
