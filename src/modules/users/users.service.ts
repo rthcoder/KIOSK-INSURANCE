@@ -153,7 +153,6 @@ export class UsersService {
       data: {
         userId: newUser.id,
         balance: 0,
-        lastId: 0,
       },
     })
   }
