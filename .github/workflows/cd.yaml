@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20.17.0" # Node.js versiyasi, GitHub Secrets emas
+          node-version: "20.17.0"
 
       # Step 3: Install pnpm manually
       - name: Install pnpm manually
@@ -31,7 +31,7 @@ jobs:
           pnpm install
           pnpm build
 
-      # Step 5: Add SSH Key from GitHub Secrets
+      # Step 5: Add SSH Key
       - name: Add SSH Key
         run: |
           mkdir -p ~/.ssh
@@ -44,11 +44,11 @@ jobs:
         uses: appleboy/ssh-action@master
         id: ssh
         with:
-          host: ${{ secrets.HOST }}               # GitHub Secrets'dan HOST
-          username: ${{ secrets.USERNAME }}        # GitHub Secrets'dan USERNAME
-          key: ${{ secrets.SSH_KEY }}              # GitHub Secrets'dan SSH_KEY (private key)
-          port: 22                                 # SSH port (22)
-          script: |                                # Serverda bajariladigan buyruqlar
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
             cd ~/KIOSK-INSURANCE/
             git stash || { echo "git stash failed"; exit 1; }
             git pull origin main || { echo "git pull failed"; exit 1; }
