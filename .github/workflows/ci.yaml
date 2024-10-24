@@ -21,9 +21,9 @@ jobs:
           node-version: '20.17.0'
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4  # pnpm'ni o'rnatish uchun tavsiya etilgan action
+        uses: pnpm/action-setup@v2.2.4  # pnpm'ni o'rnatish uchun action
         with:
-          version: 7.x  # Bu yerda pnpm versiyasini aniq ko'rsatasiz
+          version: 9.11.0  # Bu yerda sizning pnpm versiyangiz ko'rsatilgan
 
       - name: Install dependencies
         run: |
