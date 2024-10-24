@@ -17,7 +17,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "20.17.0" # Node versiyasi
-
+          cache: 'pnpm'
+          
       - name: Install dependencies
         run: |
           npm install pnpm
