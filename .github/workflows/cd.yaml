@@ -18,10 +18,9 @@ jobs:
         with:
           node-version: "20.17.0" # Node versiyasi
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
-        with:
-          version: 9.11.0  # pnpm versiyasini aniq ko'rsatish kerak
+      - name: Install pnpm manually  # pnpm ni qo'lda o'rnatish
+        run: |
+          npm install -g pnpm@9.11.0
 
       - name: Install dependencies
         run: |
