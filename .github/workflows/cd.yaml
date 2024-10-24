@@ -27,7 +27,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
@@ -36,6 +36,7 @@ jobs:
             pnpm install
             npx prisma migrate dev --name migrated
             npx prisma generate
+            pnpm build
             pm2 restart insurance
 
       - name: Notify Telegram on success
