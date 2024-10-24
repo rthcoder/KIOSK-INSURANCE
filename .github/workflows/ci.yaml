@@ -19,12 +19,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.17.0'
-          cache: 'pnpm'
 
-      - name: Install pnpm globally
-        run: |
-          npm install -g pnpm
-          export PATH="$(npm bin -g):$PATH"  # Global pnpm yo'lini PATH ga qo'shish
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4  # pnpm'ni o'rnatish uchun tavsiya etilgan action
 
       - name: Install dependencies
         run: |
