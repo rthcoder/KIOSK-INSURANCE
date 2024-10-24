@@ -19,7 +19,9 @@ jobs:
           node-version: "20.17.0" # Node versiyasi
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4  # pnpm'ni o'rnatish uchun action
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 9.11.0  # pnpm versiyasini aniq ko'rsatish kerak
 
       - name: Install dependencies
         run: |
@@ -61,4 +63,3 @@ jobs:
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d text="CD Failed.%0ACommit: $COMMIT_MESSAGE%0AAuthor: $COMMIT_AUTHOR"
-
