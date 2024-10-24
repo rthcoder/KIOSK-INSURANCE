@@ -27,20 +27,13 @@ jobs:
           pnpm install
           pnpm build
 
-      - name: Add SSH Key  # Private keyni ishlatish uchun
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-
       - name: Setup SSH
         uses: appleboy/ssh-action@master
         id: ssh
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}  # Secret orqali private key ishlatiladi
+          key: ${{ secrets.SSH_KEY }}  # SSH_PRIVATE_KEY secret orqali olingan private key
           port: 22
           script: |
             cd ~/KIOSK-INSURANCE/
